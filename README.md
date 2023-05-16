@@ -1,30 +1,29 @@
-# RadeonSensor - Kext and Gadget to show Radeon GPU temperature on macOS
+# RadeonSensor
 
-[![GitHub release](https://img.shields.io/github/release/Aluveitie/RadeonSensor?include_prereleases=&sort=semver&color=blue)](https://github.com/Aluveitie/RadeonSensor/releases/) [![download-badge](https://img.shields.io/github/downloads/aluveitie/RadeonSensor/total.svg?style=flat-square "Download status")](https://github.com/aluveitie/RadeonSensor/releases/latest "Download status")
+macOS Kext and Gadget that display the GPU temperature of AMD GPUs in the system
 
-![](./imgs/icon.png)
+[![Release Badge](https://img.shields.io/github/release/NootInc/RadeonSensor?include_prereleases&style=for-the-badge&sort=semver&color=blue)](https://github.com/NootInc/RadeonSensor/releases) [![Downloads Badge](https://img.shields.io/github/downloads/NootInc/RadeonSensor/total.svg?style=for-the-badge)](https://github.com/NootInc/RadeonSensor/releases/latest "Download status")
 
-The kext is based on FakeSMCs RadeonMonitor to provide GPU temperature to a dedicated gadget without relying on FakeSMC being installed and can therefore be used with VirtualSMC instead, or without either in a VM with GPU passed through. All credits for the code to read the GPU temperature go to FakeSMC/RadeonMonitor project.
+![Menu Bar Screenshot](Assets/MenuBar.png)
 
-The design of the status bar is based on the AMD PowerGadget to fit together.
+The design is based on AMD Power Gadget.
 
 ## GPU temperature and MacOS
-Starting with the Radeon VII, Apple stopped reporting the temperature directly, requiring kexts to step in and implement that feature. For Vega 10 and older, other tools can already display the GPU temperature without the need for additional kexts.
+
+Apple stopped reporting the temperature since the Radeon VII. Vega 10 and older can still report the temperature using external tools.
 
 ## Components
 
-* RadeonSensor.kext: Required to read the GPU temperature and requires Lilu
-* SMCRadeonGPU.kext: Can be used optionally to export GPU temperature to VirtualSMC for monitoring tools to read and requires VirtualSMC
-* RadeonGadget.app: Displays GPU temperature in the status bar and requires only the RadeonSensor kext to be loaded
+* `RadeonSensor.kext`: Main sensor component. Requires Lilu
+* `SMCRadeonGPU.kext`: Exports sensor values to VirtualSMC for monitoring tools that utilise the SMC
+* `RadeonGadget.app`: Displays GPU temperature in the status bar. Requires `RadeonSensor.kext` to be loaded
 
 ## Supported GPUs
 
-All GPUs starting Radeon HD 7000 series up to the RX 6000 series are supported on macOS 10.15 and newer.
-
-<br/>
-
-![](./imgs/status_bar.png)
+All AMD GPUs starting with Radeon HD 7000 series up to the RX 6000 series are supported on macOS 10.15 and newer.
 
 ### Credits
-* [FakeSMC3](https://github.com/CloverHackyColor/FakeSMC3_with_plugins)
-* [SMCAMDProcessor](https://github.com/trulyspinach/SMCAMDProcessor)
+
+* [Linux](https://github.com/torvalds/linux) for the temperature logic
+* [Acidanthera](https://github.com/Acidanthera) for Lilu and VirtualSMC
+* [SMCAMDProcessor](https://github.com/trulyspinach/SMCAMDProcessor) for the gadget design

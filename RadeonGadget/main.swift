@@ -1,14 +1,9 @@
-//
-//  main.swift
-//  RadeonGadget
-//
-//  Created by Aluveitie on 01.10.21.
-//
+//  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
+//  details.
 
 import AppKit
 
-let app = NSApplication.shared
 let delegate = AppDelegate()
+let app = NSApplication.shared
 app.delegate = delegate
-
 _ = NSApplicationMain(CommandLine.argc, CommandLine.unsafeArgv)

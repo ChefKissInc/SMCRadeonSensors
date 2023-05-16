@@ -1,11 +1,8 @@
-//
-//  RadeonSensor.cpp
-//  RadeonSensor
-//
-//  Created by Aluveitie on 24.09.21.
-//
-#include <IOKit/IOLib.h>
+//  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
+//  details.
+
 #include "RadeonSensor.hpp"
+#include <IOKit/IOLib.h>
 
 #define super IOService
 
@@ -14,68 +11,59 @@ uint32_t ADDPR(debugPrintDelay) = 0;
 
 OSDefineMetaClassAndStructors(RadeonSensor, IOService);
 
-bool RadeonSensor::init(OSDictionary *dictionary){
+bool RadeonSensor::init(OSDictionary *dictionary) {
     if (!super::init(dictionary)) {
+        IOLog("RadeonSensor::init: super::init failed\n");
         return false;
     }
-    
-    IOLog("RadeonSensor initialized");
-    
+
+    IOLog("RadeonSensor::init\n");
+
     return true;
 }
 
 void RadeonSensor::free() {
-    IOLog("RadeonSensor freeing up");
-    
-    delete [] radeonCards;
-        
+    IOLog("RadeonSensor::free\n");
+
+    delete[] radeonCards;
+
     super::free();
 }
 
-IOService* RadeonSensor::probe(IOService* provider, SInt32* score) {
-    if (super::probe(provider, score) != this) {
-        return 0;
-    }
-    
+IOService *RadeonSensor::probe(IOService *provider, SInt32 *score) {
+    if (super::probe(provider, score) != this) { return 0; }
+
     int count = 0;
-    int maxCount = 4; // maximally support 4 GPUs
-    RadeonCard** cards = new RadeonCard*[4];
-    if (OSDictionary * dictionary = serviceMatching("IOPCIDevice")) {
-        if (OSIterator * iterator = getMatchingServices(dictionary)) {
+    int maxCount = 4;    // 4 GPUs max
+    RadeonCard **cards = new RadeonCard *[4];
+    if (OSDictionary *dictionary = serviceMatching("IOPCIDevice")) {
+        if (OSIterator *iterator = getMatchingServices(dictionary)) {
             UInt32 vendor_id = 0;
             UInt32 class_id = 0;
-            IOPCIDevice* device = NULL;
+            IOPCIDevice *device = NULL;
             do {
                 device = OSDynamicCast(IOPCIDevice, iterator->getNextObject());
-                if (!device) {
-                    break;
-                }
+                if (!device) { break; }
                 vendor_id = 0;
                 OSData *data = OSDynamicCast(OSData, device->getProperty("vendor-id"));
                 if (data) {
-                    vendor_id = *(UInt32*)data->getBytesNoCopy();
+                    vendor_id = *(UInt32 *)data->getBytesNoCopy();
                 } else {
                     data = OSDynamicCast(OSData, device->getProperty("ATY,VendorID"));
-                    if (data) {
-                      vendor_id = *(UInt32*)data->getBytesNoCopy();
-                    }
+                    if (data) { vendor_id = *(UInt32 *)data->getBytesNoCopy(); }
                 }
 
                 int device_id = 0;
                 data = OSDynamicCast(OSData, device->getProperty("device-id"));
-                if (data) {
-                    device_id = *(UInt32*)data->getBytesNoCopy();
-                }
+                if (data) { device_id = *(UInt32 *)data->getBytesNoCopy(); }
 
                 class_id = 0;
                 data = OSDynamicCast(OSData, device->getProperty("class-code"));
-                if (data) {
-                    class_id = *(UInt32*)data->getBytesNoCopy();
-                }
+                if (data) { class_id = *(UInt32 *)data->getBytesNoCopy(); }
 
-                if ((vendor_id==0x1002) && (class_id == 0x030000)) {
+                if ((vendor_id == 0x1002) && (class_id == 0x030000)) {
                     IOLog("RadeonSensor found Radeon PCIe device id=%x", (unsigned int)device_id);
-                    RadeonCard* radeonCard = new RadeonCard();
+                    RadeonCard *radeonCard = new RadeonCard();
                     if (radeonCard->initialize(device, device_id)) {
                         IOLog("RadeonSensor initialized card (%x)", device_id);
                         cards[count] = radeonCard;
@@ -83,16 +71,13 @@ IOService* RadeonSensor::probe(IOService* provider, SInt32* score) {
                     } else {
                         IOLog("RadeonSensor could not initialize card (%x)", device_id);
                     }
-                    
-                    
-                    if (count == maxCount) {
-                        break;
-                    }
-              }
+
+                    if (count == maxCount) { break; }
+                }
             } while (device);
         }
     }
-    
+
     if (count > 0) {
         nrOfCards = count;
         radeonCards = cards;
@@ -103,45 +88,40 @@ IOService* RadeonSensor::probe(IOService* provider, SInt32* score) {
 }
 
 bool RadeonSensor::start(IOService *provider) {
-    IOLog("RadeonSensor starting\n");
-    
-    if(!super::start(provider)){
-        IOLog("RadeonSensor failed to start\n");
+    if (!super::start(provider)) {
+        IOLog("RadeonSensor::start: super::start failed\n");
         return false;
     }
-    
+
     registerService();
-        
+
+    IOLog("RadeonSensor::start\n");
     return true;
 }
 
 void RadeonSensor::stop(IOService *provider) {
-    IOLog("RadeonSensor stopping\n");
-    
+    IOLog("RadeonSensor::stop\n");
+
     super::stop(provider);
 }
 
 UInt16 RadeonSensor::getTemperature(UInt16 card) {
-    if (card >= nrOfCards) {
-        return 0;
-    }
-    
+    if (card >= nrOfCards) { return 0; }
+
     UInt16 temp = 0;
-    RadeonCard* radeonCard = radeonCards[card];
+    RadeonCard *radeonCard = radeonCards[card];
     radeonCard->getTemperature(&temp);
     return temp;
 }
 
-UInt16 RadeonSensor::getNumberOfCards() {
-    return nrOfCards;
-}
+UInt16 RadeonSensor::getNumberOfCards() { return nrOfCards; }
 
 EXPORT extern "C" kern_return_t radeonsensor_start(kmod_info_t *, void *) {
     // Report success but actually do not start and let I/O Kit unload us.
     // This works better and increases boot speed in some cases.
     PE_parse_boot_argn("liludelay", &ADDPR(debugPrintDelay), sizeof(ADDPR(debugPrintDelay)));
     ADDPR(debugEnabled) = checkKernelArgument("-radpdbg");
-       
+
     return KERN_SUCCESS;
 }
 
