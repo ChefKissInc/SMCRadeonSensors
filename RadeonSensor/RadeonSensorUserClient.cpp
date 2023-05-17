@@ -2,6 +2,7 @@
 //  details.
 
 #include "RadeonSensorUserClient.hpp"
+#include <Headers/kern_util.hpp>
 #include <IOKit/IOLib.h>
 
 #define super IOUserClient
