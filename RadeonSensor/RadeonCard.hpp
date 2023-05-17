@@ -13,6 +13,7 @@ enum struct ChipFamily {
     SouthernIslands,
     VolcanicIslands,
     ArcticIslands,
+    Navi,
 };
 
 class RadeonCard : public OSObject {

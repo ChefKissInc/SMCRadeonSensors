@@ -9,9 +9,11 @@ OSDefineMetaClassAndStructors(RadeonCard, OSObject);
 bool RadeonCard::initialise(IOPCIDevice *radeonDevice, UInt32 chipID) {
     this->deviceId = chipID & 0xFFFF;
 
-    if (((this->deviceId >= 0x66A0) && (this->deviceId <= 0x66AF)) ||
-        ((this->deviceId >= 0x6860) && (this->deviceId <= 0x687F)) ||
-        ((this->deviceId >= 0x7301) && (this->deviceId <= 0x73FF))) {
+    if (((this->deviceId >= 0x7301) && (this->deviceId <= 0x73FF))) {
+        chipFamily = ChipFamily::Navi;
+        IOLog("RadeonCard::initialise(): Navi (DID=%04X)\n", this->deviceId);
+    } else if (((this->deviceId >= 0x66A0) && (this->deviceId <= 0x66AF)) ||
+               ((this->deviceId >= 0x6860) && (this->deviceId <= 0x687F))) {
         chipFamily = ChipFamily::ArcticIslands;
         IOLog("RadeonCard::initialise(): Arctic Islands (DID=%04X)\n", this->deviceId);
     } else if (((this->deviceId >= 0x67C0) && (this->deviceId <= 0x67FF)) ||
@@ -63,6 +65,8 @@ IOReturn RadeonCard::getTemperature(UInt16 *data) {
         case ChipFamily::VolcanicIslands:
             return arcticTemperature(data);
         case ChipFamily::ArcticIslands:
+            [[fallthrough]];
+        case ChipFamily::Navi:
             return vegaTemperature(data);
         default:
             return kIOReturnError;
