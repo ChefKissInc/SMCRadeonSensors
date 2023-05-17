@@ -59,14 +59,14 @@ private class StatusbarView: NSView {
 
 private class SingleGpuStatusbarView: StatusbarView {
     override func draw(_ dirtyRect: NSRect) {
-        guard let context = NSGraphicsContext.current?.cgContext else { return }
+        guard (NSGraphicsContext.current?.cgContext) != nil else { return }
 
         let temp: String
         if temps.count == 0 {
             temp = "-"
         } else if temps[0] > 125 {
             temp = "INV"
-            NSLog("Found invalid temperature: %u", temps[0])
+            NSLog("Invalid temperature: %u", temps[0])
         } else {
             temp = "\(temps[0])º"
         }
@@ -80,7 +80,7 @@ private class MultiGpuStatusbarView: StatusbarView {
     var nrOfGpus: Int = 0
 
     override func draw(_ dirtyRect: NSRect) {
-        guard let context = NSGraphicsContext.current?.cgContext else { return }
+        guard (NSGraphicsContext.current?.cgContext) != nil else { return }
 
         drawTitle(label: "GPU", x: 0)
         for i in 0...nrOfGpus-1 {
@@ -89,7 +89,7 @@ private class MultiGpuStatusbarView: StatusbarView {
                 temp = "-"
             } else if temps[i] > 125 {
                 temp = "INV"
-                NSLog("Found invalid temperature for GPU %u: %u", i, temps[0])
+                NSLog("Invalid temperature for GPU %u: %u", i, temps[0])
             } else {
                 temp = "\(temps[i])º"
             }
@@ -100,7 +100,7 @@ private class MultiGpuStatusbarView: StatusbarView {
 
 private class NoGpuStatusbarView: StatusbarView {
     override func draw(_ dirtyRect: NSRect) {
-        guard let context = NSGraphicsContext.current?.cgContext else { return }
+        guard (NSGraphicsContext.current?.cgContext) != nil else { return }
 
         drawTitle(label: "GPU NOT FOUND", x: 0)
     }
@@ -108,12 +108,9 @@ private class NoGpuStatusbarView: StatusbarView {
 
 class StatusBarController {
     private var statusItem: NSStatusItem!
-    fileprivate var view: StatusbarView!
-
+    private var view: StatusbarView!
     private var popover: NSPopover
-
     private var updateTimer: Timer?
-
     private var nrOfGpus: Int
 
     init() {
