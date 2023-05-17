@@ -2,6 +2,7 @@
 //  details.
 
 #include "RadeonSensor.hpp"
+#include <Headers/kern_util.hpp>
 #include <IOKit/IOLib.h>
 
 #define super IOService
@@ -31,16 +32,14 @@ void RadeonSensor::free() {
 }
 
 IOService *RadeonSensor::probe(IOService *provider, SInt32 *score) {
-    if (super::probe(provider, score) != this) { return 0; }
+    if (super::probe(provider, score) != this) { return nullptr; }
 
-    int count = 0;
-    int maxCount = 4;    // 4 GPUs max
+    int count = 0, maxCount = 4;    // 4 GPUs max
     RadeonCard **cards = new RadeonCard *[4];
     if (OSDictionary *dictionary = serviceMatching("IOPCIDevice")) {
         if (OSIterator *iterator = getMatchingServices(dictionary)) {
-            UInt32 vendor_id = 0;
-            UInt32 class_id = 0;
-            IOPCIDevice *device = NULL;
+            UInt32 vendor_id = 0, class_id = 0;
+            IOPCIDevice *device = nullptr;
             do {
                 device = OSDynamicCast(IOPCIDevice, iterator->getNextObject());
                 if (!device) { break; }
@@ -64,7 +63,7 @@ IOService *RadeonSensor::probe(IOService *provider, SInt32 *score) {
                 if ((vendor_id == 0x1002) && (class_id == 0x030000)) {
                     IOLog("RadeonSensor found Radeon PCIe device id=%x", (unsigned int)device_id);
                     RadeonCard *radeonCard = new RadeonCard();
-                    if (radeonCard->initialize(device, device_id)) {
+                    if (radeonCard->initialise(device, device_id)) {
                         IOLog("RadeonSensor initialized card (%x)", device_id);
                         cards[count] = radeonCard;
                         count++;
@@ -82,9 +81,9 @@ IOService *RadeonSensor::probe(IOService *provider, SInt32 *score) {
         nrOfCards = count;
         radeonCards = cards;
         return this;
-    } else {
-        return 0;
     }
+
+    return nullptr;
 }
 
 bool RadeonSensor::start(IOService *provider) {

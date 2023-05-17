@@ -7,39 +7,30 @@
 #include <IOKit/IOService.h>
 #include <IOKit/pci/IOPCIDevice.h>
 
-enum TempFamilies {
-    R9xx,
-    RCIx,
-    RAIx,
-    RVEx,
-};
-
-enum ChipFamily {
-    CHIP_FAMILY_PITCAIRN,
-    CHIP_FAMILY_HAWAII,
-    CHIP_FAMILY_POLARIS,
-    CHIP_FAMILY_VEGA,
+enum struct ChipFamily {
+    Unknown,
+    SeaIslands,
+    SouthernIslands,
+    VolcanicIslands,
+    ArcticIslands,
 };
 
 class RadeonCard : public OSObject {
     OSDeclareDefaultStructors(RadeonCard);
 
     public:
-    bool initialize(IOPCIDevice *radeonDevice, UInt32 chipID);
+    bool initialise(IOPCIDevice *radeonDevice, UInt32 chipID);
     IOReturn getTemperature(UInt16 *data);
 
     private:
-    UInt32 deviceId;
-    UInt16 chipFamily;
-    UInt16 tempFamily;
+    UInt32 deviceId {0};
+    ChipFamily chipFamily {ChipFamily::Unknown};
 
-    volatile UInt8 *mmioBase;
-    IOMemoryMap *mmio;
-    UInt32 caps;
-    UInt32 tReg;
-    int cardNumber;
-
-    bool initializeFamily(UInt32 chipID);
+    volatile UInt8 *mmioBase {nullptr};
+    IOMemoryMap *mmioMap {nullptr};
+    UInt32 caps {0};
+    UInt32 tReg {0};
+    int cardNumber {0};
 
     UInt32 read32(UInt32 reg);
     void write32(UInt32 reg, UInt32 val);
