@@ -8,14 +8,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     static var shared: AppDelegate {
         guard let delegate = NSApp.delegate as? AppDelegate else {
-            fatalError("App delegate not set")
+            fatalError("Invalid delegate")
         }
         return delegate
     }
 
     func applicationDidFinishLaunching(_ aNotification: Notification) {
         NSApp.setActivationPolicy(NSApplication.ActivationPolicy.accessory)
-        statusBar = StatusBarController.init()
+        self.statusBar = StatusBarController.init()
     }
 
     func applicationWillTerminate(_ aNotification: Notification) {}

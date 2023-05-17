@@ -8,17 +8,17 @@ class RadeonModel {
     private var connect: io_connect_t = 0
 
     init() {
-        if !initDriver() {
-            alertAndQuit("Please download RadeonSensor from the release page.")
-        }
+       if !self.initDriver() {
+           self.alert("Please download RadeonSensor from the release page", critical: true)
+       }
 
-        let gadgetVersion = (0, 4)
-        let kextVersion = getKextVersion()
-        if kextVersion.1 > gadgetVersion.1 {
-            alert("There are updates available for RadeonSensor. Update to the latest version for more features.")
-        } else if kextVersion.1 < gadgetVersion.1 || kextVersion.0 != gadgetVersion.0 {
-            alertAndQuit("Your RadeonSensor.kext is incompatible with this version of RadeonGadget.")
-        }
+       let gadgetVersion = (0, 4)
+       let kextVersion = self.getKextVersion()
+       if kextVersion.1 < gadgetVersion.1 || kextVersion.0 != gadgetVersion.0 {
+           self.alert("Your RadeonSensor is incompatible with this version of RadeonGadget", critical: true)
+       } else if kextVersion.1 > gadgetVersion.1 {
+           self.alert("Update to the latest version for more features")
+       }
     }
 
     func getKextVersion() -> (Int, Int) {
@@ -32,13 +32,9 @@ class RadeonModel {
                                       &scalarOut, &outputCount,
                                       &outputStr, &outputStrCount)
 
-        let kextVersion = String(cString: Array(outputStr[0...outputStrCount-1]))
-        if kextVersion.contains(".") {
-            let versionArr = kextVersion.components(separatedBy: ".")
-            return (Int(versionArr[0]) ?? 0, Int(versionArr[1]) ?? 0)
-        } else {
-            return (0, 0)
-        }
+        let version = String(cString: Array(outputStr[0...outputStrCount - 1])).components(separatedBy: ".")
+        if version.count <= 1 { self.alert("Invalid kext version", critical: true) }
+        return (Int(version[0]) ?? 0, Int(version[1]) ?? 0)
     }
 
     func getGpuCount() -> Int {
@@ -59,7 +55,7 @@ class RadeonModel {
         var outputCount: UInt32 = 0
 
         var outputStr: [UInt16] = [UInt16](repeating: 0, count: gpuCount)
-        var outputStrCount: Int = 2 /* sizeof(UInt16) */ * gpuCount
+        var outputStrCount: Int = MemoryLayout<UInt16>.size * gpuCount
         _ = IOConnectCallMethod(connect, 2, nil, 0, nil, 0,
                                       &scalarOut, &outputCount,
                                       &outputStr, &outputStrCount)
@@ -76,31 +72,16 @@ class RadeonModel {
         return IOServiceOpen(serviceObject, mach_task_self_, 0, &connect) == KERN_SUCCESS
     }
 
-    private func alertAndQuit(_ message: String) {
+    private func alert(_ message: String, critical: Bool = false) {
         let alert = NSAlert()
-        alert.messageText = "RadeonSensor not found"
+        alert.messageText = critical ? "RadeonSensor communication failure" : "Update Available"
         alert.informativeText = message
         alert.alertStyle = .critical
-        alert.addButton(withTitle: "Quit")
-        alert.addButton(withTitle: "Quit and Download")
-
+        alert.addButton(withTitle: critical ? "Quit" : "Dismiss")
+        alert.addButton(withTitle: "\(critical ? "Quit and " : "")Download")
         if alert.runModal() == .alertSecondButtonReturn {
             NSWorkspace.shared.open(URL(string: "https://github.com/NootInc/RadeonSensor/releases")!)
         }
-
-        NSApplication.shared.terminate(self)
-    }
-
-    private func alert(_ message: String) {
-        let alert = NSAlert()
-        alert.messageText = "RadeonSensor update available"
-        alert.informativeText = message
-        alert.alertStyle = .warning
-        alert.addButton(withTitle: "Dismiss")
-        alert.addButton(withTitle: "Download")
-
-        if alert.runModal() == .alertSecondButtonReturn {
-            NSWorkspace.shared.open(URL(string: "https://github.com/NootInc/RadeonSensor/releases")!)
-        }
+        if critical { NSApplication.shared.terminate(self) }
     }
 }
