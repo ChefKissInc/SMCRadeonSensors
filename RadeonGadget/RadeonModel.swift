@@ -41,7 +41,7 @@ class RadeonModel {
         }
     }
 
-    func getNrOfGpus() -> Int {
+    func getGpuCount() -> Int {
         var scalarOut: UInt64 = 0
         var outputCount: UInt32 = 1
 
@@ -54,12 +54,12 @@ class RadeonModel {
         return Int(scalarOut)
     }
 
-    func getTemps(_ nrOfGpus: Int) -> [Int] {
+    func getTemps(_ gpuCount: Int) -> [Int] {
         var scalarOut: UInt64 = 0
         var outputCount: UInt32 = 0
 
-        var outputStr: [UInt16] = [UInt16](repeating: 0, count: nrOfGpus)
-        var outputStrCount: Int = 2 /* sizeof(UInt16) */ * nrOfGpus
+        var outputStr: [UInt16] = [UInt16](repeating: 0, count: gpuCount)
+        var outputStrCount: Int = 2 /* sizeof(UInt16) */ * gpuCount
         _ = IOConnectCallMethod(connect, 2, nil, 0, nil, 0,
                                       &scalarOut, &outputCount,
                                       &outputStr, &outputStrCount)
@@ -82,7 +82,7 @@ class RadeonModel {
         alert.informativeText = message
         alert.alertStyle = .critical
         alert.addButton(withTitle: "Quit")
-        alert.addButton(withTitle: "Quit and download")
+        alert.addButton(withTitle: "Quit and Download")
 
         if alert.runModal() == .alertSecondButtonReturn {
             NSWorkspace.shared.open(URL(string: "https://github.com/NootInc/RadeonSensor/releases")!)
@@ -97,7 +97,7 @@ class RadeonModel {
         alert.informativeText = message
         alert.alertStyle = .warning
         alert.addButton(withTitle: "Dismiss")
-        alert.addButton(withTitle: "Visit releases page")
+        alert.addButton(withTitle: "Download")
 
         if alert.runModal() == .alertSecondButtonReturn {
             NSWorkspace.shared.open(URL(string: "https://github.com/NootInc/RadeonSensor/releases")!)

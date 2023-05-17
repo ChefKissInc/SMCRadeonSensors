@@ -77,13 +77,13 @@ private class SingleGpuStatusbarView: StatusbarView {
 }
 
 private class MultiGpuStatusbarView: StatusbarView {
-    var nrOfGpus: Int = 0
+    var gpuCount: Int = 0
 
     override func draw(_ dirtyRect: NSRect) {
         guard (NSGraphicsContext.current?.cgContext) != nil else { return }
 
         drawTitle(label: "GPU", x: 0)
-        for i in 0...nrOfGpus-1 {
+        for i in 0...gpuCount-1 {
             let temp: String
             if i > temps.count || temps[i] == 255 {
                 temp = "-"
@@ -111,24 +111,24 @@ class StatusBarController {
     private var view: StatusbarView!
     private var popover: NSPopover
     private var updateTimer: Timer?
-    private var nrOfGpus: Int
+    private var gpuCount: Int
 
     init() {
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
         statusItem.isVisible = true
 
-        nrOfGpus = RadeonModel.shared.getNrOfGpus()
-        if nrOfGpus < 1 {
+        gpuCount = RadeonModel.shared.getGpuCount()
+        if gpuCount < 1 {
             view = NoGpuStatusbarView()
             statusItem.length = 110
-        } else if nrOfGpus == 1 {
+        } else if gpuCount == 1 {
             view = SingleGpuStatusbarView()
             statusItem.length = 70
         } else {
             let multiview = MultiGpuStatusbarView()
-            multiview.nrOfGpus = nrOfGpus
+            multiview.gpuCount = gpuCount
             view = multiview
-            statusItem.length = CGFloat((35 + (nrOfGpus * 40) - 5))
+            statusItem.length = CGFloat((35 + (gpuCount * 40) - 5))
         }
         view.setup()
 
@@ -145,7 +145,7 @@ class StatusBarController {
             statusBarButton.target = self
         }
 
-        if nrOfGpus > 0 {
+        if gpuCount > 0 {
             updateTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true, block: { _ in
                 self.update()
             })
@@ -153,10 +153,7 @@ class StatusBarController {
     }
 
     func update() {
-        let temps = RadeonModel.shared.getTemps(nrOfGpus)
-
-        view.temps = temps
-
+        view.temps = RadeonModel.shared.getTemps(gpuCount)
         view.setNeedsDisplay(view.frame)
     }
 
