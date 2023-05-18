@@ -6,8 +6,6 @@
 
 #include "SMCRadeonGPU.hpp"
 #include <VirtualSMCSDK/AppleSmc.h>
-#include <VirtualSMCSDK/kern_vsmcapi.hpp>
-#include <libkern/libkern.h>
 
 class RadeonSMCValue : public VirtualSMCValue {
     protected:
@@ -18,7 +16,7 @@ class RadeonSMCValue : public VirtualSMCValue {
     RadeonSMCValue(RadeonSensor *provider, size_t index) : index {index}, provider {provider} {}
 };
 
-class GPUTempProvider : public RadeonSMCValue {
+class RGPUTempValue : public RadeonSMCValue {
     using RadeonSMCValue::RadeonSMCValue;
 
     protected:

@@ -1,0 +1,35 @@
+//  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
+//  details.
+
+#include "kern_rsensor.hpp"
+#include "RSensorCard.hpp"
+#include <Headers/kern_api.hpp>
+#include <Headers/kern_devinfo.hpp>
+
+void RSensor::init() {
+    SYSLOG("rsensor", "Copyright 2023 ChefKiss Inc. If you've paid for this, you've been scammed.");
+
+    lilu.onPatcherLoadForce(
+        [](void *user, [[maybe_unused]] KernelPatcher &patcher) { static_cast<RSensor *>(user)->populateCards(); },
+        this);
+}
+
+void RSensor::deinit() { OSSafeReleaseNULL(this->cards); }
+
+void RSensor::populateCards() {
+    auto *devInfo = DeviceInfo::create();
+    if (!devInfo) { return; }
+    this->cards = OSArray::withCapacity(0);
+    for (size_t i = 0; i < devInfo->videoExternal.size(); i++) {
+        auto *obj = OSDynamicCast(IOPCIDevice, devInfo->videoExternal[i].video);
+        if (obj && devInfo->videoExternal[i].vendor == WIOKit::VendorID::ATIAMD) {
+            auto *card = new RSensorCard();
+            if (!card || !card->initialise(obj)) {
+                OSSafeReleaseNULL(card);
+                continue;
+            }
+            this->cards->setObject(card);
+        }
+    }
+    DBGLOG("rsensor", "Found %lu cards", this->radeonCards->getCount());
+}

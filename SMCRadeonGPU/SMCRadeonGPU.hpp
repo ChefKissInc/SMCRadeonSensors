@@ -5,7 +5,7 @@
 #define SMCRadeonGPU_hpp
 
 #include <IOKit/IOLib.h>
-#include <RadeonSensor.hpp>
+#include <kern_rsensor.hpp>
 #include <VirtualSMCSDK/kern_vsmcapi.hpp>
 #include <VirtualSMCSDK/AppleSmc.h>
 
@@ -36,7 +36,7 @@ class EXPORT SMCRadeonGPU : public IOService {
 
     virtual IOReturn setPowerState(unsigned long state, IOService *whatDevice) override;
 
-    static bool vsmcNotificationHandler(void *sensors, void *refCon, IOService *vsmc, IONotifier *notifier);
+    static bool vsmcNotificationHandler(void *target, void *refCon, IOService *newService, IONotifier *notifier);
 
     private:
     RadeonSensor *fProvider;

@@ -1,13 +1,14 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#include "RadeonCard.hpp"
+#include "RSensorCard.hpp"
 #include "RadeonChipsets.hpp"
+#include <Headers/kern_iokit.hpp>
 
-OSDefineMetaClassAndStructors(RadeonCard, OSObject);
+OSDefineMetaClassAndStructors(RSensorCard, OSObject);
 
-bool RadeonCard::initialise(IOPCIDevice *radeonDevice, UInt32 chipID) {
-    this->deviceId = chipID & 0xFFFF;
+bool RSensorCard::initialise(IOPCIDevice *radeonDevice) {
+    this->deviceId = WIOKit::readPCIConfigValue(radeonDevice, WIOKit::kIOPCIConfigDeviceID);
 
     if (((this->deviceId >= 0x7301) && (this->deviceId <= 0x73FF))) {
         chipFamily = ChipFamily::Navi;
@@ -56,7 +57,7 @@ bool RadeonCard::initialise(IOPCIDevice *radeonDevice, UInt32 chipID) {
     return true;
 }
 
-IOReturn RadeonCard::getTemperature(UInt16 *data) {
+IOReturn RSensorCard::getTemperature(UInt16 *data) {
     switch (this->chipFamily) {
         case ChipFamily::SeaIslands:
             [[fallthrough]];
@@ -73,14 +74,14 @@ IOReturn RadeonCard::getTemperature(UInt16 *data) {
     }
 }
 
-UInt32 RadeonCard::read_smc(UInt32 reg) {
+UInt32 RSensorCard::read_smc(UInt32 reg) {
     UInt32 r;
     write32(SMC_IND_INDEX_0, (reg));
     r = read32(SMC_IND_DATA_0);
     return r;
 }
 
-UInt32 RadeonCard::read_ind(UInt32 reg) {
+UInt32 RSensorCard::read_ind(UInt32 reg) {
     // unsigned long flags;
     UInt32 r;
     // spin_lock_irqsave(&rdev->smc_idx_lock, flags);
@@ -90,11 +91,11 @@ UInt32 RadeonCard::read_ind(UInt32 reg) {
     return r;
 }
 
-UInt32 RadeonCard::read32(UInt32 reg) { return OSReadLittleInt32((mmioBase), reg); }
+UInt32 RSensorCard::read32(UInt32 reg) { return OSReadLittleInt32((mmioBase), reg); }
 
-void RadeonCard::write32(UInt32 reg, UInt32 val) { return OSWriteLittleInt32((mmioBase), reg, val); }
+void RSensorCard::write32(UInt32 reg, UInt32 val) { return OSWriteLittleInt32((mmioBase), reg, val); }
 
-IOReturn RadeonCard::tahitiTemperature(UInt16 *data) {
+IOReturn RSensorCard::tahitiTemperature(UInt16 *data) {
     UInt32 temp, actual_temp = 0;
     for (int i = 0; i < 1000; i++) {    // attempts to ready
         temp = (read32(CG_SI_THERMAL_STATUS) & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT;
@@ -114,7 +115,7 @@ IOReturn RadeonCard::tahitiTemperature(UInt16 *data) {
     return kIOReturnSuccess;
 }
 
-IOReturn RadeonCard::arcticTemperature(UInt16 *data) {
+IOReturn RSensorCard::arcticTemperature(UInt16 *data) {
     UInt32 temp, actual_temp = 0;
     for (int i = 0; i < 1000; i++) {    // attempts to ready
         temp = (read_ind(CG_CI_MULT_THERMAL_STATUS) & CI_CTF_TEMP_MASK) >> CI_CTF_TEMP_SHIFT;
@@ -134,7 +135,7 @@ IOReturn RadeonCard::arcticTemperature(UInt16 *data) {
     return kIOReturnSuccess;
 }
 
-IOReturn RadeonCard::vegaTemperature(UInt16 *data) {
+IOReturn RSensorCard::vegaTemperature(UInt16 *data) {
     UInt32 temp, actual_temp = 0;
 
     temp = read32(mmTHM_TCON_CUR_TMP) >> THM_TCON_CUR_TMP__CUR_TEMP__SHIFT;

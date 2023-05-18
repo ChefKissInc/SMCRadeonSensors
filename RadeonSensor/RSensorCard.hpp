@@ -16,11 +16,11 @@ enum struct ChipFamily {
     Navi,
 };
 
-class RadeonCard : public OSObject {
-    OSDeclareDefaultStructors(RadeonCard);
+class RSensorCard : public OSObject {
+    OSDeclareDefaultStructors(RSensorCard);
 
     public:
-    bool initialise(IOPCIDevice *radeonDevice, UInt32 chipID);
+    bool initialise(IOPCIDevice *radeonDevice);
     IOReturn getTemperature(UInt16 *data);
 
     private:

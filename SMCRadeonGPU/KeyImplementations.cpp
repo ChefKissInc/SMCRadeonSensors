@@ -2,13 +2,10 @@
 //  details.
 
 #include "KeyImplementations.hpp"
-#include <os/log.h>
 
-SMC_RESULT GPUTempProvider::readAccess() {
-    UInt16 temp = provider->getTemperature(index);
-
-    UInt16 *ptr = reinterpret_cast<UInt16 *>(data);
-    *ptr = VirtualSMCAPI::encodeIntSp(SmcKeyTypeSp78, temp);
+SMC_RESULT RGPUTempValue::readAccess() {
+    *reinterpret_cast<UInt16 *>(this->data) =
+        VirtualSMCAPI::encodeIntSp(SmcKeyTypeSp78, this->provider->getTemperature(index));
 
     return SmcSuccess;
 }

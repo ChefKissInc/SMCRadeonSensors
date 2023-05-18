@@ -2,6 +2,7 @@
 //  details.
 
 #include "SMCRadeonGPU.hpp"
+#include "Headers/kern_util.hpp"
 #include "KeyImplementations.hpp"
 #include <os/log.h>
 
@@ -32,13 +33,13 @@ IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
     bool suc = true;
     for (auto i = 0; i < gpuCount; i++) {
         suc &= VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new GPUTempProvider(this->fProvider, i)));
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
         suc &= VirtualSMCAPI::addKey(KeyTGxP(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new GPUTempProvider(this->fProvider, i)));
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
         suc &= VirtualSMCAPI::addKey(KeyTGxd(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new GPUTempProvider(this->fProvider, i)));
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
         suc &= VirtualSMCAPI::addKey(KeyTGxp(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new GPUTempProvider(this->fProvider, i)));
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
     }
 
     if (!suc) { os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::init: setting up SMC keys failed"); }
@@ -67,15 +68,16 @@ bool SMCRadeonGPU::start(IOService *provider) {
     return true;
 }
 
-bool SMCRadeonGPU::vsmcNotificationHandler(void *sensors, void *refCon, IOService *vsmc, IONotifier *notifier) {
-    if (!sensors || !vsmc) {
+bool SMCRadeonGPU::vsmcNotificationHandler(void *target, [[maybe_unused]] void *refCon, IOService *newService,
+    [[maybe_unused]] IONotifier *notifier) {
+    if (!target || !newService) {
         os_log(OS_LOG_DEFAULT, "SMCRadeonGPU null vsmc notification");
         return false;
     }
 
     os_log(OS_LOG_DEFAULT, "SMCRadeonGPU got vsmc notification");
-    auto &plugin = static_cast<SMCRadeonGPU *>(sensors)->vsmcPlugin;
-    auto ret = vsmc->callPlatformFunction(VirtualSMCAPI::SubmitPlugin, true, sensors, &plugin, nullptr, nullptr);
+    auto &plugin = static_cast<SMCRadeonGPU *>(target)->vsmcPlugin;
+    auto ret = newService->callPlatformFunction(VirtualSMCAPI::SubmitPlugin, true, target, &plugin, nullptr, nullptr);
     if (ret == kIOReturnSuccess) {
         os_log(OS_LOG_DEFAULT, "SMCRadeonGPU submitted plugin");
         return true;
@@ -88,4 +90,4 @@ bool SMCRadeonGPU::vsmcNotificationHandler(void *sensors, void *refCon, IOServic
     }
 }
 
-void SMCRadeonGPU::stop(IOService *provider) { os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::stop"); }
+void SMCRadeonGPU::stop([[maybe_unused]] IOService *provider) { PANIC("smcrgpu", "called stop!!!"); }
