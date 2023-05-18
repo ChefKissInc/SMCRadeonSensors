@@ -12,13 +12,13 @@ uint32_t ADDPR(debugPrintDelay) = 0;
 
 IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
     if (!IOService::probe(provider, score)) {
-        SYSLOG("smcrgpu", "Failed to probe the parent");
+        SYSLOG("init", "Failed to probe the parent");
         return nullptr;
     }
 
     this->fProvider = OSDynamicCast(RadeonSensor, provider);
     if (!this->fProvider) {
-        SYSLOG("smcrgpu", "Null fProvider");
+        SYSLOG("init", "Null fProvider");
         return nullptr;
     }
 
