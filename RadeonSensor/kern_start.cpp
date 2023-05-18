@@ -50,6 +50,8 @@ bool PRODUCT_NAME::start(IOService *provider) {
         return false;
     }
 
+    this->registerService();
+
     return ADDPR(startSuccess);
 }
 

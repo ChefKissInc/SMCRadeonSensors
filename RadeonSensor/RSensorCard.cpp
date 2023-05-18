@@ -10,48 +10,52 @@ OSDefineMetaClassAndStructors(RSensorCard, OSObject);
 bool RSensorCard::initialise(IOPCIDevice *radeonDevice) {
     this->deviceId = WIOKit::readPCIConfigValue(radeonDevice, WIOKit::kIOPCIConfigDeviceID);
 
-    if (((this->deviceId >= 0x7301) && (this->deviceId <= 0x73FF))) {
+    if ((this->deviceId >= 0x7301 && this->deviceId <= 0x73FF)) {
         chipFamily = ChipFamily::Navi;
-        IOLog("RadeonCard::initialise(): Navi (DID=%04X)\n", this->deviceId);
-    } else if (((this->deviceId >= 0x66A0) && (this->deviceId <= 0x66AF)) ||
-               ((this->deviceId >= 0x6860) && (this->deviceId <= 0x687F))) {
+        DBGLOG("rsensor", "Family: Navi");
+    } else if (this->deviceId == 0x15DD || this->deviceId == 0x15D8 || this->deviceId == 0x164C ||
+               this->deviceId == 0x1636 || this->deviceId == 0x15E7 || this->deviceId == 0x1638) {
+        chipFamily = ChipFamily::Raven;
+        DBGLOG("rsensor", "Family: Raven");
+    } else if ((this->deviceId >= 0x66A0 && this->deviceId <= 0x66AF) ||
+               (this->deviceId >= 0x6860 && this->deviceId <= 0x687F)) {
         chipFamily = ChipFamily::ArcticIslands;
-        IOLog("RadeonCard::initialise(): Arctic Islands (DID=%04X)\n", this->deviceId);
-    } else if (((this->deviceId >= 0x67C0) && (this->deviceId <= 0x67FF)) ||
-               ((this->deviceId >= 0x6980) && (this->deviceId <= 0x699F))) {
+        DBGLOG("rsensor", "Family: Arctic Islands");
+    } else if ((this->deviceId >= 0x67C0 && this->deviceId <= 0x67FF) ||
+               (this->deviceId >= 0x6980 && this->deviceId <= 0x699F)) {
         chipFamily = ChipFamily::VolcanicIslands;
-        IOLog("RadeonCard::initialise(): Volcanic Islands (DID=%04X)\n", this->deviceId);
-    } else if (((this->deviceId >= 0x67A0) && (this->deviceId <= 0x67BF)) ||
-               ((this->deviceId >= 0x6900) && (this->deviceId <= 0x693F)) ||
-               ((this->deviceId >= 0x6600) && (this->deviceId <= 0x663F)) ||
-               ((this->deviceId >= 0x6640) && (this->deviceId <= 0x666F))) {
+        DBGLOG("rsensor", "Family: Volcanic Islands");
+    } else if ((this->deviceId >= 0x67A0 && this->deviceId <= 0x67BF) ||
+               (this->deviceId >= 0x6900 && this->deviceId <= 0x693F) ||
+               (this->deviceId >= 0x6600 && this->deviceId <= 0x663F) ||
+               (this->deviceId >= 0x6640 && this->deviceId <= 0x666F)) {
         chipFamily = ChipFamily::SouthernIslands;
-        IOLog("RadeonCard::initialise(): Southern Islands (DID=%04X)\n", this->deviceId);
-    } else if (((this->deviceId >= 0x6780) && (this->deviceId <= 0x679F)) ||
-               ((this->deviceId >= 0x6800) && (this->deviceId <= 0x683F))) {
+        DBGLOG("rsensor", "Family: Southern Islands");
+    } else if ((this->deviceId >= 0x6780 && this->deviceId <= 0x679F) ||
+               (this->deviceId >= 0x6800 && this->deviceId <= 0x683F)) {
         chipFamily = ChipFamily::SeaIslands;
-        IOLog("RadeonCard::initialise(): Sea Islands (DID=%04X)\n", this->deviceId);
+        DBGLOG("rsensor", "Family: Sea Islands");
     } else {
-        IOLog("RadeonCard::initialise(): Unsupported card (DID=%04X)\n", this->deviceId);
+        SYSLOG("rsensor", "Unsupported card 0x%04X", this->deviceId);
         return false;
     }
 
     if (chipFamily >= ChipFamily::SouthernIslands) {
         this->mmioMap = radeonDevice->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress5);
         if (!this->mmioMap || !this->mmioMap->getLength()) {
-            IOLog("RadeonCard::initialize(): Failed to map BAR5\n");
+            DBGLOG("rsensor", "Failed to map BAR5");
             return false;
         }
         this->mmioBase = reinterpret_cast<volatile UInt8 *>(this->mmioMap->getVirtualAddress());
-        IOLog("RadeonCard::initialize(): Using BAR5, located at %p\n", this->mmioBase);
+        DBGLOG("rsensor", "Using BAR5, located at %p", this->mmioBase);
     } else {
         this->mmioMap = radeonDevice->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress2);
         if (!this->mmioMap || !this->mmioMap->getLength()) {
-            IOLog("RadeonCard::initialize(): Failed to map BAR2\n");
+            DBGLOG("rsensor", "Failed to map BAR2");
             return false;
         }
         this->mmioBase = reinterpret_cast<volatile UInt8 *>(this->mmioMap->getVirtualAddress());
-        IOLog("RadeonCard::initialize(): Using BAR2, located at %p\n", this->mmioBase);
+        DBGLOG("rsensor", "Using BAR2, located at %p", this->mmioBase);
     }
 
     return true;
@@ -66,6 +70,8 @@ IOReturn RSensorCard::getTemperature(UInt16 *data) {
         case ChipFamily::VolcanicIslands:
             return arcticTemperature(data);
         case ChipFamily::ArcticIslands:
+            [[fallthrough]];
+        case ChipFamily::Raven:
             [[fallthrough]];
         case ChipFamily::Navi:
             return vegaTemperature(data);

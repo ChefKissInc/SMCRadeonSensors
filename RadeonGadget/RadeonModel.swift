@@ -4,9 +4,10 @@
 import Cocoa
 
 enum RadeonSensorSelector: UInt32 {
-    case getVersion = 0
-    case getCardCount = 1
-    case getTemperatures = 2
+    case getVersionLength = 0
+    case getVersion = 1
+    case getCardCount = 2
+    case getTemperatures = 3
 }
 
 class RadeonModel {
@@ -18,7 +19,7 @@ class RadeonModel {
            self.alert("Please download RadeonSensor from the release page", critical: true)
        }
 
-       let gadgetVersion = (0, 4)
+       let gadgetVersion = (1, 0)
        let kextVersion = self.getKextVersion()
        if kextVersion.1 < gadgetVersion.1 || kextVersion.0 != gadgetVersion.0 {
            self.alert("Your RadeonSensor is incompatible with this version of RadeonGadget", critical: true)
@@ -30,14 +31,13 @@ class RadeonModel {
     func getKextVersion() -> (Int, Int) {
         var scalarOut: UInt64 = 0
         var outputCount: UInt32 = 1
-
-        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getVersion.rawValue, nil, 0, nil, 0,
+        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getVersionLength.rawValue, nil, 0, nil, 0,
                                       &scalarOut, &outputCount, nil, nil)
 
         var outputStrCount: Int = Int(scalarOut)
         var outputStr: [CChar] = [CChar](repeating: 0, count: outputStrCount)
         _ = IOConnectCallMethod(connect, RadeonSensorSelector.getVersion.rawValue, nil, 0, nil, 0,
-                                      &scalarOut, &outputCount,
+                                      nil, nil,
                                       &outputStr, &outputStrCount)
 
         let version = String(cString: Array(outputStr[0...outputStrCount - 1])).components(separatedBy: ".")

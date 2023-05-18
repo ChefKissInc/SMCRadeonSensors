@@ -20,7 +20,7 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>IOKitPersonalities</key>
 	<dict>
-		<key>aluveitie.SMCRadeonGPU</key>
+		<key>com.ChefKissInc.SMCRadeonGPU</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
@@ -36,12 +36,12 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>OSBundleLibraries</key>
 	<dict>
-		<key>aluveitie.RadeonSensor</key>
-		<string>$(MARKETING_VERSION)</string>
 		<key>as.vit9696.Lilu</key>
 		<string>1.2.0</string>
 		<key>as.vit9696.VirtualSMC</key>
 		<string>1.0.0</string>
+		<key>com.ChefKissInc.RadeonSensor</key>
+		<string>$(MARKETING_VERSION)</string>
 		<key>com.apple.iokit.IOPCIFamily</key>
 		<string>1.0.0b1</string>
 		<key>com.apple.kec.Libm</key>

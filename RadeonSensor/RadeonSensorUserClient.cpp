@@ -49,18 +49,18 @@ void RadeonSensorUserClient::stop(IOService *provider) {
 
 IOReturn RadeonSensorUserClient::externalMethod(uint32_t selector, IOExternalMethodArguments *arguments,
     IOExternalMethodDispatch *, OSObject *, void *) {
+    static char version[] = xStringify(MODULE_VERSION);
     switch (selector) {
+        case RadeonSensorSelector::GetVersionLength: {
+            arguments->scalarOutputCount = 1;
+            arguments->scalarOutput[0] = sizeof(version);
+            arguments->structureOutputSize = 0;
+            break;
+        }
         case RadeonSensorSelector::GetVersion: {
-            static char version[] = xStringify(MODULE_VERSION);
-            if (arguments->structureOutput) {
-                arguments->scalarOutputCount = 0;
-                arguments->structureOutputSize = sizeof(version);
-                memcpy(arguments->structureOutput, version, sizeof(version));
-            } else {
-                arguments->scalarOutputCount = 1;
-                arguments->scalarOutput[0] = sizeof(version);
-                arguments->structureOutputSize = 0;
-            }
+            arguments->scalarOutputCount = 0;
+            arguments->structureOutputSize = sizeof(version);
+            memcpy(arguments->structureOutput, version, sizeof(version));
             break;
         }
         case RadeonSensorSelector::GetCardCount: {
@@ -71,8 +71,7 @@ IOReturn RadeonSensorUserClient::externalMethod(uint32_t selector, IOExternalMet
         }
         case RadeonSensorSelector::GetTemperatures: {
             UInt16 cardCount = this->mProvider->getCardCount();
-            arguments->scalarOutputCount = 1;
-            arguments->scalarOutput[0] = cardCount;
+            arguments->scalarOutputCount = 0;
 
             arguments->structureOutputSize = cardCount * sizeof(UInt16);
             for (size_t i = 0; i < cardCount; i++) {

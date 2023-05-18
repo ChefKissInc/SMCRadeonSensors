@@ -10,7 +10,8 @@
 
 struct RadeonSensorSelector {
     enum : uint32_t {
-        GetVersion = 0,
+        GetVersionLength = 0,
+        GetVersion,
         GetCardCount,
         GetTemperatures,
     };

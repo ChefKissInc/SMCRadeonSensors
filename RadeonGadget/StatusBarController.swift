@@ -80,8 +80,7 @@ class StatusBarController {
         self.statusItem.isVisible = true
 
         self.gpuCount = RadeonModel.shared.getGpuCount()
-        self.statusItem.length = (self.gpuCount == 0 ? 35.0 * 2.0 : 35.0) +
-                                 (self.gpuCount == 1 ? 35.0 : CGFloat(self.gpuCount) * 45.0)
+        self.statusItem.length = (self.gpuCount == 0 ? 35.0 * 2.0 : 35.0) + CGFloat(self.gpuCount) * 45.0
         self.view = StatusbarView()
         self.view.gpuCount = self.gpuCount
         self.view.setup()
