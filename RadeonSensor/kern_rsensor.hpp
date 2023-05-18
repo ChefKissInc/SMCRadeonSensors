@@ -19,7 +19,7 @@ class EXPORT RadeonSensor : public IOService {
 };
 
 struct RSensor {
-    OSArray *cards = nullptr;
+    OSArray *cards {nullptr};
 
     void init();
     void deinit();

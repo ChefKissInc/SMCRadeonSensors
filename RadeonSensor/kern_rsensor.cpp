@@ -9,9 +9,7 @@
 void RSensor::init() {
     SYSLOG("rsensor", "Copyright 2023 ChefKiss Inc. If you've paid for this, you've been scammed.");
 
-    lilu.onPatcherLoadForce(
-        [](void *user, [[maybe_unused]] KernelPatcher &patcher) { static_cast<RSensor *>(user)->populateCards(); },
-        this);
+    lilu.onPatcherLoadForce([](void *user, KernelPatcher &) { static_cast<RSensor *>(user)->populateCards(); }, this);
 }
 
 void RSensor::deinit() { OSSafeReleaseNULL(this->cards); }

@@ -9,8 +9,7 @@
 
 OSDefineMetaClassAndStructors(RadeonSensorUserClient, IOUserClient);
 
-bool RadeonSensorUserClient::initWithTask(task_t owningTask, void *securityToken, UInt32 type,
-    OSDictionary *properties) {
+bool RadeonSensorUserClient::initWithTask(task_t owningTask, void *securityToken, UInt32 type, OSDictionary *) {
     if (!owningTask) return false;
 
     if (!super::initWithTask(owningTask, securityToken, type)) {
@@ -49,7 +48,7 @@ void RadeonSensorUserClient::stop(IOService *provider) {
 }
 
 IOReturn RadeonSensorUserClient::externalMethod(uint32_t selector, IOExternalMethodArguments *arguments,
-    IOExternalMethodDispatch *dispatch, OSObject *target, void *reference) {
+    IOExternalMethodDispatch *, OSObject *, void *) {
     switch (selector) {
         case RadeonSensorSelector::GetVersion: {
             static char version[] = xStringify(MODULE_VERSION);

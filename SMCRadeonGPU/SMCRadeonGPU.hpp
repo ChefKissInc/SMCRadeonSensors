@@ -4,7 +4,6 @@
 #ifndef SMCRadeonGPU_hpp
 #define SMCRadeonGPU_hpp
 
-#include <IOKit/IOLib.h>
 #include <kern_rsensor.hpp>
 #include <VirtualSMCSDK/kern_vsmcapi.hpp>
 #include <VirtualSMCSDK/AppleSmc.h>
@@ -27,20 +26,17 @@ class EXPORT SMCRadeonGPU : public IOService {
     };
 
     public:
-    virtual bool init(OSDictionary *dictionary = 0) override;
-    virtual IOService *probe(IOService *provider, SInt32 *score) override;
-    virtual void free(void) override;
+    IOService *probe(IOService *provider, SInt32 *score) override;
 
-    virtual bool start(IOService *provider) override;
-    virtual void stop(IOService *provider) override;
+    bool start(IOService *provider) override;
+    void stop(IOService *provider) override;
 
-    virtual IOReturn setPowerState(unsigned long state, IOService *whatDevice) override;
+    IOReturn setPowerState(unsigned long state, IOService *whatDevice) override;
 
     static bool vsmcNotificationHandler(void *target, void *refCon, IOService *newService, IONotifier *notifier);
 
     private:
-    RadeonSensor *fProvider;
-
+    RadeonSensor *fProvider {nullptr};
     IONotifier *vsmcNotifier {nullptr};
 };
 

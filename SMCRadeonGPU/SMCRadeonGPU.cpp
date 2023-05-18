@@ -2,57 +2,44 @@
 //  details.
 
 #include "SMCRadeonGPU.hpp"
-#include "Headers/kern_util.hpp"
 #include "KeyImplementations.hpp"
-#include <os/log.h>
+#include <Headers/kern_util.hpp>
 
 OSDefineMetaClassAndStructors(SMCRadeonGPU, IOService);
 
-bool SMCRadeonGPU::init(OSDictionary *dictionary) {
-    if (!IOService::init(dictionary)) { return false; }
-
-    os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::init");
-    return true;
-}
+bool ADDPR(debugEnabled) = true;
+uint32_t ADDPR(debugPrintDelay) = 0;
 
 IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
-    auto ptr = IOService::probe(provider, score);
-    if (!ptr) {
-        os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::probe: super::probe failed");
+    if (!IOService::probe(provider, score)) {
+        SYSLOG("smcrgpu", "Failed to probe the parent");
         return nullptr;
     }
 
     this->fProvider = OSDynamicCast(RadeonSensor, provider);
     if (!this->fProvider) {
-        os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::init: null fProvider");
+        SYSLOG("smcrgpu", "Null fProvider");
         return nullptr;
     }
 
-    os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::init: setting up SMC keys");
     auto gpuCount = this->fProvider->getCardCount();
-    bool suc = true;
     for (auto i = 0; i < gpuCount; i++) {
-        suc &= VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
+        VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
-        suc &= VirtualSMCAPI::addKey(KeyTGxP(i), vsmcPlugin.data,
+        VirtualSMCAPI::addKey(KeyTGxP(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
-        suc &= VirtualSMCAPI::addKey(KeyTGxd(i), vsmcPlugin.data,
+        VirtualSMCAPI::addKey(KeyTGxd(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
-        suc &= VirtualSMCAPI::addKey(KeyTGxp(i), vsmcPlugin.data,
+        VirtualSMCAPI::addKey(KeyTGxp(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
     }
 
-    if (!suc) { os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::init: setting up SMC keys failed"); }
-
-    os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::probe");
     return this;
 }
 
-void SMCRadeonGPU::free(void) { os_log(OS_LOG_DEFAULT, "SMCRadeonGPU freeing up"); }
-
 bool SMCRadeonGPU::start(IOService *provider) {
     if (!IOService::start(provider)) {
-        os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::start: super::start failed");
+        SYSLOG("init", "Failed to start the parent");
         return false;
     }
 
@@ -60,34 +47,45 @@ bool SMCRadeonGPU::start(IOService *provider) {
 
     this->vsmcNotifier = VirtualSMCAPI::registerHandler(vsmcNotificationHandler, this);
     if (!this->vsmcNotifier) {
-        os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::start: failed to register vsmc notification handler");
+        SYSLOG("init", "Failed to register notification handler");
         return false;
     }
 
-    os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::start");
     return true;
 }
 
-bool SMCRadeonGPU::vsmcNotificationHandler(void *target, [[maybe_unused]] void *refCon, IOService *newService,
-    [[maybe_unused]] IONotifier *notifier) {
+bool SMCRadeonGPU::vsmcNotificationHandler(void *target, void *, IOService *newService, IONotifier *) {
     if (!target || !newService) {
-        os_log(OS_LOG_DEFAULT, "SMCRadeonGPU null vsmc notification");
+        SYSLOG("smcrgpu", "Null notification");
         return false;
     }
 
-    os_log(OS_LOG_DEFAULT, "SMCRadeonGPU got vsmc notification");
     auto &plugin = static_cast<SMCRadeonGPU *>(target)->vsmcPlugin;
     auto ret = newService->callPlatformFunction(VirtualSMCAPI::SubmitPlugin, true, target, &plugin, nullptr, nullptr);
     if (ret == kIOReturnSuccess) {
-        os_log(OS_LOG_DEFAULT, "SMCRadeonGPU submitted plugin");
+        DBGLOG("smcrgpu", "Submitted plugin");
         return true;
     } else if (ret != kIOReturnUnsupported) {
-        os_log(OS_LOG_DEFAULT, "SMCRadeonGPU plugin submission failure %X", ret);
+        DBGLOG("smcrgpu", "Plugin submission failure %X", ret);
         return false;
     } else {
-        os_log(OS_LOG_DEFAULT, "SMCRadeonGPU plugin submission to non vsmc");
+        DBGLOG("smcrgpu", "Plugin submitted to non-VSMC");
         return false;
     }
 }
 
-void SMCRadeonGPU::stop([[maybe_unused]] IOService *provider) { PANIC("smcrgpu", "called stop!!!"); }
+void SMCRadeonGPU::stop(IOService *) { PANIC("smcrgpu", "Called stop!!!"); }
+
+EXPORT extern "C" kern_return_t ADDPR(kern_start)(kmod_info_t *, void *) {
+    // Report success but actually do not start and let I/O Kit unload us.
+    // This works better and increases boot speed in some cases.
+    lilu_get_boot_args("liludelay", &ADDPR(debugPrintDelay), sizeof(ADDPR(debugPrintDelay)));
+    ADDPR(debugEnabled) =
+        checkKernelArgument("-vsmcdbg") || checkKernelArgument("-rsensordbg") || checkKernelArgument("-liludbgall");
+    return KERN_SUCCESS;
+}
+
+EXPORT extern "C" kern_return_t ADDPR(kern_stop)(kmod_info_t *, void *) {
+    // It is not safe to unload VirtualSMC plugins!
+    return KERN_FAILURE;
+}
