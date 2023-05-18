@@ -8,6 +8,14 @@
 #include <IOKit/IOService.h>
 #include <IOKit/IOUserClient.h>
 
+struct RadeonSensorSelector {
+    enum : uint32_t {
+        GetVersion = 0,
+        GetCardCount,
+        GetTemperatures,
+    };
+};
+
 class RadeonSensorUserClient : public IOUserClient {
     OSDeclareDefaultStructors(RadeonSensorUserClient);
 

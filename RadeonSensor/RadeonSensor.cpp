@@ -78,8 +78,8 @@ IOService *RadeonSensor::probe(IOService *provider, SInt32 *score) {
     }
 
     if (count > 0) {
-        nrOfCards = count;
-        radeonCards = cards;
+        this->cardCount = count;
+        this->radeonCards = cards;
         return this;
     }
 
@@ -92,7 +92,7 @@ bool RadeonSensor::start(IOService *provider) {
         return false;
     }
 
-    registerService();
+    this->registerService();
 
     IOLog("RadeonSensor::start\n");
     return true;
@@ -105,15 +105,14 @@ void RadeonSensor::stop(IOService *provider) {
 }
 
 UInt16 RadeonSensor::getTemperature(UInt16 card) {
-    if (card >= nrOfCards) { return 0; }
+    if (card >= this->cardCount) { return 0xFF; }
 
     UInt16 temp = 0;
-    RadeonCard *radeonCard = radeonCards[card];
-    radeonCard->getTemperature(&temp);
+    this->radeonCards[card]->getTemperature(&temp);
     return temp;
 }
 
-UInt16 RadeonSensor::getNumberOfCards() { return nrOfCards; }
+UInt16 RadeonSensor::getCardCount() { return cardCount; }
 
 EXPORT extern "C" kern_return_t radeonsensor_start(kmod_info_t *, void *) {
     // Report success but actually do not start and let I/O Kit unload us.

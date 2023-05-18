@@ -6,8 +6,6 @@ macOS Kext and Gadget that display the GPU temperature of AMD GPUs in the system
 
 ![Status Bar Screenshot](Assets/StatusBar.png)
 
-The design is based on AMD Power Gadget.
-
 ## GPU temperature and MacOS
 
 Apple stopped reporting the temperature since the Radeon VII. Vega 10 and older can still report the temperature using external tools.

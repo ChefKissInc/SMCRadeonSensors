@@ -51,37 +51,34 @@ void RadeonSensorUserClient::stop(IOService *provider) {
 IOReturn RadeonSensorUserClient::externalMethod(uint32_t selector, IOExternalMethodArguments *arguments,
     IOExternalMethodDispatch *dispatch, OSObject *target, void *reference) {
     switch (selector) {
-        // Get Kext version string
-        case 0: {
-            char version[] = xStringify(MODULE_VERSION);
-            arguments->scalarOutputCount = 0;
-            arguments->structureOutputSize = sizeof(version);
-
-            char *dataOut = (char *)arguments->structureOutput;
-            for (uint32_t i = 0; i < arguments->structureOutputSize; i++) { dataOut[i] = version[i]; }
-
+        case RadeonSensorSelector::GetVersion: {
+            static char version[] = xStringify(MODULE_VERSION);
+            if (arguments->structureOutput) {
+                arguments->scalarOutputCount = 0;
+                arguments->structureOutputSize = sizeof(version);
+                memcpy(arguments->structureOutput, version, sizeof(version));
+            } else {
+                arguments->scalarOutputCount = 1;
+                arguments->scalarOutput[0] = sizeof(version);
+                arguments->structureOutputSize = 0;
+            }
             break;
         }
-        // Get number of cards
-        case 1: {
-            UInt16 numCards = mProvider->getNumberOfCards();
+        case RadeonSensorSelector::GetCardCount: {
             arguments->scalarOutputCount = 1;
-            arguments->scalarOutput[0] = numCards;
-
+            arguments->scalarOutput[0] = this->mProvider->getCardCount();
             arguments->structureOutputSize = 0;
-
             break;
         }
-        // Get temperatures
-        case 2: {
-            UInt16 numCards = mProvider->getNumberOfCards();
+        case RadeonSensorSelector::GetTemperatures: {
+            UInt16 cardCount = this->mProvider->getCardCount();
             arguments->scalarOutputCount = 1;
-            arguments->scalarOutput[0] = numCards;
+            arguments->scalarOutput[0] = cardCount;
 
-            arguments->structureOutputSize = numCards * sizeof(UInt16);
-            UInt16 *dataOut = (UInt16 *)arguments->structureOutput;
-            for (int i = 0; i < numCards; i++) { dataOut[i] = mProvider->getTemperature(i); }
-
+            arguments->structureOutputSize = cardCount * sizeof(UInt16);
+            for (size_t i = 0; i < cardCount; i++) {
+                static_cast<UInt16 *>(arguments->structureOutput)[i] = this->mProvider->getTemperature(i);
+            }
             break;
         }
     }

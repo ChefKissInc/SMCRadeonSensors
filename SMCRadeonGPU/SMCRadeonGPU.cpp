@@ -28,7 +28,7 @@ IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
     }
 
     os_log(OS_LOG_DEFAULT, "SMCRadeonGPU::init: setting up SMC keys");
-    auto gpuCount = this->fProvider->getNumberOfCards();
+    auto gpuCount = this->fProvider->getCardCount();
     bool suc = true;
     for (auto i = 0; i < gpuCount; i++) {
         suc &= VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,

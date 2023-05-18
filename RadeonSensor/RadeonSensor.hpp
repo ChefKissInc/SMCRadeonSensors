@@ -18,10 +18,10 @@ class RadeonSensor : public IOService {
     virtual void stop(IOService *provider) override;
 
     UInt16 getTemperature(UInt16 card);
-    UInt16 getNumberOfCards();
+    UInt16 getCardCount();
 
     private:
-    UInt16 nrOfCards = 0;
+    UInt16 cardCount = 0;
     RadeonCard **radeonCards = nullptr;
 };
 

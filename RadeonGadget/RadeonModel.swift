@@ -3,6 +3,12 @@
 
 import Cocoa
 
+enum RadeonSensorSelector: UInt32 {
+    case getVersion = 0
+    case getCardCount = 1
+    case getTemperatures = 2
+}
+
 class RadeonModel {
     static let shared = RadeonModel()
     private var connect: io_connect_t = 0
@@ -23,12 +29,14 @@ class RadeonModel {
 
     func getKextVersion() -> (Int, Int) {
         var scalarOut: UInt64 = 0
-        var outputCount: UInt32 = 0
+        var outputCount: UInt32 = 1
 
-        let maxStrLength = 16
-        var outputStr: [CChar] = [CChar](repeating: 0, count: maxStrLength)
-        var outputStrCount: Int = maxStrLength
-        _ = IOConnectCallMethod(connect, 0, nil, 0, nil, 0,
+        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getVersion.rawValue, nil, 0, nil, 0,
+                                      &scalarOut, &outputCount, nil, nil)
+
+        var outputStrCount: Int = Int(scalarOut)
+        var outputStr: [CChar] = [CChar](repeating: 0, count: outputStrCount)
+        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getVersion.rawValue, nil, 0, nil, 0,
                                       &scalarOut, &outputCount,
                                       &outputStr, &outputStrCount)
 
@@ -43,9 +51,8 @@ class RadeonModel {
 
         var outputStr: [UInt64] = [UInt64]()
         var outputStrCount: Int = 0
-        _ = IOConnectCallMethod(connect, 1, nil, 0, nil, 0,
-                                       &scalarOut, &outputCount,
-                                       &outputStr, &outputStrCount)
+        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getCardCount.rawValue, nil, 0, nil, 0,
+                                       &scalarOut, &outputCount, nil, nil)
 
         return Int(scalarOut)
     }
@@ -56,7 +63,7 @@ class RadeonModel {
 
         var outputStr: [UInt16] = [UInt16](repeating: 0, count: gpuCount)
         var outputStrCount: Int = MemoryLayout<UInt16>.size * gpuCount
-        _ = IOConnectCallMethod(connect, 2, nil, 0, nil, 0,
+        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getTemperatures.rawValue, nil, 0, nil, 0,
                                       &scalarOut, &outputCount,
                                       &outputStr, &outputStrCount)
 
