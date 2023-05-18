@@ -49,8 +49,6 @@ class RadeonModel {
         var scalarOut: UInt64 = 0
         var outputCount: UInt32 = 1
 
-        var outputStr: [UInt64] = [UInt64]()
-        var outputStrCount: Int = 0
         _ = IOConnectCallMethod(connect, RadeonSensorSelector.getCardCount.rawValue, nil, 0, nil, 0,
                                        &scalarOut, &outputCount, nil, nil)
 
