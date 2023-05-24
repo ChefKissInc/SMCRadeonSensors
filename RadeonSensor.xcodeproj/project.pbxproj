@@ -546,7 +546,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"${PROJECT_DIR}/Lilu.kext/Contents/Resources",
 					"${PROJECT_DIR}/VirtualSMC.kext/Contents/Resources",
@@ -554,7 +553,6 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Headers",
 				);
 				INFOPLIST_FILE = SMCRadeonGPU/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				KERNEL_EXTENSION_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/MacKernelSDK/Headers";
 				KERNEL_FRAMEWORK_HEADERS = "$(PROJECT_DIR)/MacKernelSDK/Headers";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/MacKernelSDK/Library/x86_64";
@@ -624,7 +622,6 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = YES;
 				HEADER_SEARCH_PATHS = (
 					"${PROJECT_DIR}/Lilu.kext/Contents/Resources",
 					"${PROJECT_DIR}/VirtualSMC.kext/Contents/Resources",
@@ -632,7 +629,6 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Headers",
 				);
 				INFOPLIST_FILE = SMCRadeonGPU/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				KERNEL_EXTENSION_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/MacKernelSDK/Headers";
 				KERNEL_FRAMEWORK_HEADERS = "$(PROJECT_DIR)/MacKernelSDK/Headers";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/MacKernelSDK/Library/x86_64";
@@ -866,14 +862,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = NO;
 				HEADER_SEARCH_PATHS = (
 					"${PROJECT_DIR}/Lilu.kext/Contents/Resources",
 					"${PROJECT_DIR}/VirtualSMC.kext/Contents/Resources",
 					"$(PROJECT_DIR)/MacKernelSDK/Headers",
 				);
 				INFOPLIST_FILE = RadeonSensor/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 ChefKiss Inc. All rights reserved.";
 				KERNEL_EXTENSION_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/MacKernelSDK/Headers";
 				KERNEL_FRAMEWORK_HEADERS = "$(PROJECT_DIR)/MacKernelSDK/Headers";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/MacKernelSDK/Library/x86_64";
@@ -952,14 +946,12 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				GENERATE_INFOPLIST_FILE = NO;
 				HEADER_SEARCH_PATHS = (
 					"${PROJECT_DIR}/Lilu.kext/Contents/Resources",
 					"${PROJECT_DIR}/VirtualSMC.kext/Contents/Resources",
 					"$(PROJECT_DIR)/MacKernelSDK/Headers",
 				);
 				INFOPLIST_FILE = RadeonSensor/Info.plist;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2023 ChefKiss Inc. All rights reserved.";
 				KERNEL_EXTENSION_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/MacKernelSDK/Headers";
 				KERNEL_FRAMEWORK_HEADERS = "$(PROJECT_DIR)/MacKernelSDK/Headers";
 				LIBRARY_SEARCH_PATHS = "$(PROJECT_DIR)/MacKernelSDK/Library/x86_64";
