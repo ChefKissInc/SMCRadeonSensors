@@ -1,9 +1,9 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-import Foundation
 import AppKit
 import Cocoa
+import Foundation
 import SwiftUI
 
 private class StatusbarView: NSView {
@@ -22,17 +22,14 @@ private class StatusbarView: NSView {
         pStyle.maximumLineHeight = compactLH
 
         self.compactLabel = [
-            .font: NSFont.monospacedSystemFont(ofSize: 7.2, weight: .regular),
-            .foregroundColor: NSColor.labelColor,
-            .paragraphStyle: pStyle
+            .font: NSFont.monospacedSystemFont(ofSize: 7.2, weight: .regular), .foregroundColor: NSColor.labelColor,
+            .paragraphStyle: pStyle,
         ]
         self.normalValue = [
-            .font: NSFont.systemFont(ofSize: 14, weight: .regular),
-            .foregroundColor: NSColor.labelColor
+            .font: NSFont.systemFont(ofSize: 14, weight: .regular), .foregroundColor: NSColor.labelColor,
         ]
         self.normalLabel = [
-            .font: NSFont.systemFont(ofSize: 13, weight: .regular),
-            .foregroundColor: NSColor.labelColor
+            .font: NSFont.systemFont(ofSize: 13, weight: .regular), .foregroundColor: NSColor.labelColor,
         ]
     }
 
@@ -53,7 +50,7 @@ private class StatusbarView: NSView {
             self.drawTitle("NONE", x: 35.0)
             return
         }
-        for i in 0...gpuCount - 1 {
+        for i in 0 ... gpuCount - 1 {
             var temp: String
             if i >= self.temps.count || self.temps[i] == 255 {
                 temp = "-  "
@@ -97,9 +94,7 @@ class StatusBarController {
         }
 
         if self.gpuCount > 0 {
-            self.updateTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true, block: { _ in
-                self.update()
-            })
+            self.updateTimer = Timer.scheduledTimer(withTimeInterval: 2, repeats: true, block: { _ in self.update() })
         }
     }
 
@@ -127,26 +122,17 @@ struct PopupView: View {
     var body: some View {
         VStack {
             HStack {
-                Image(nsImage: NSImage(named: "AppIcon")!)
-                    .resizable()
-                    .frame(width: 32.0, height: 32.0)
-                Text("RadeonSensor")
-                    .font(.title)
-                    .padding(.bottom, 5.0)
+                Image(nsImage: NSImage(named: "AppIcon")!).resizable().frame(width: 32.0, height: 32.0)
+                Text("RadeonSensor").font(.title).padding(.bottom, 5.0)
             }
-            Text("More coming soon™")
-                .font(.caption)
-                .padding(.bottom, 5.0)
+            Text("More coming soon™").font(.caption).padding(.bottom, 5.0)
             ZStack {
                 Button("Exit", action: { exit(0) })
                 Spacer()
-                Text("Noot")
-                    .font(.caption.italic())
-                    .frame(maxWidth: .infinity, alignment: .trailing)
+                Text("Noot").font(.caption.italic()).frame(maxWidth: .infinity, alignment: .trailing)
             }
             .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0)
         }
-        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0)
-        .padding(12.0)
+        .frame(minWidth: 0, maxWidth: .infinity, minHeight: 0).padding(12.0)
     }
 }

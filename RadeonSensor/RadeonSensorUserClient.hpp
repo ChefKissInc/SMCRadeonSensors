@@ -3,7 +3,6 @@
 
 #ifndef RadeonSensorUserClient_hpp
 #define RadeonSensorUserClient_hpp
-
 #include "kern_rsensor.hpp"
 #include <IOKit/IOService.h>
 #include <IOKit/IOUserClient.h>

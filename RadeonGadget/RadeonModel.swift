@@ -15,32 +15,29 @@ class RadeonModel {
     private var connect: io_connect_t = 0
 
     init() {
-       if !self.initDriver() {
-           self.alert("Please download RadeonSensor from the release page", critical: true)
-       }
+        if !self.initDriver() { self.alert("Please download RadeonSensor from the release page", critical: true) }
 
-       let gadgetVersion = (1, 0)
-       let kextVersion = self.getKextVersion()
-       if kextVersion.1 < gadgetVersion.1 || kextVersion.0 != gadgetVersion.0 {
-           self.alert("Your RadeonSensor is incompatible with this version of RadeonGadget", critical: true)
-       } else if kextVersion.1 > gadgetVersion.1 {
-           self.alert("Update to the latest version for more features")
-       }
+        let gadgetVersion = (1, 0)
+        let kextVersion = self.getKextVersion()
+        if kextVersion.1 < gadgetVersion.1 || kextVersion.0 != gadgetVersion.0 {
+            self.alert("Your RadeonSensor is incompatible with this version of RadeonGadget", critical: true)
+        } else if kextVersion.1 > gadgetVersion.1 {
+            self.alert("Update to the latest version for more features")
+        }
     }
 
     func getKextVersion() -> (Int, Int) {
         var scalarOut: UInt64 = 0
         var outputCount: UInt32 = 1
-        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getVersionLength.rawValue, nil, 0, nil, 0,
-                                      &scalarOut, &outputCount, nil, nil)
+        _ = IOConnectCallMethod(
+            connect, RadeonSensorSelector.getVersionLength.rawValue, nil, 0, nil, 0, &scalarOut, &outputCount, nil, nil)
 
         var outputStrCount: Int = Int(scalarOut)
         var outputStr: [CChar] = [CChar](repeating: 0, count: outputStrCount)
-        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getVersion.rawValue, nil, 0, nil, 0,
-                                      nil, nil,
-                                      &outputStr, &outputStrCount)
+        _ = IOConnectCallMethod(
+            connect, RadeonSensorSelector.getVersion.rawValue, nil, 0, nil, 0, nil, nil, &outputStr, &outputStrCount)
 
-        let version = String(cString: Array(outputStr[0...outputStrCount - 1])).components(separatedBy: ".")
+        let version = String(cString: Array(outputStr[0 ... outputStrCount - 1])).components(separatedBy: ".")
         if version.count <= 1 { self.alert("Invalid kext version", critical: true) }
         return (Int(version[0]) ?? 0, Int(version[1]) ?? 0)
     }
@@ -49,8 +46,8 @@ class RadeonModel {
         var scalarOut: UInt64 = 0
         var outputCount: UInt32 = 1
 
-        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getCardCount.rawValue, nil, 0, nil, 0,
-                                       &scalarOut, &outputCount, nil, nil)
+        _ = IOConnectCallMethod(
+            connect, RadeonSensorSelector.getCardCount.rawValue, nil, 0, nil, 0, &scalarOut, &outputCount, nil, nil)
 
         return Int(scalarOut)
     }
@@ -61,18 +58,16 @@ class RadeonModel {
 
         var outputStr: [UInt16] = [UInt16](repeating: 0, count: gpuCount)
         var outputStrCount: Int = MemoryLayout<UInt16>.size * gpuCount
-        _ = IOConnectCallMethod(connect, RadeonSensorSelector.getTemperatures.rawValue, nil, 0, nil, 0,
-                                      &scalarOut, &outputCount,
-                                      &outputStr, &outputStrCount)
+        _ = IOConnectCallMethod(
+            connect, RadeonSensorSelector.getTemperatures.rawValue, nil, 0, nil, 0, &scalarOut, &outputCount,
+            &outputStr, &outputStrCount)
 
         return outputStr.map { Int($0) }
     }
 
     private func initDriver() -> Bool {
         let serviceObject = IOServiceGetMatchingService(kIOMasterPortDefault, IOServiceMatching("RadeonSensor"))
-        if serviceObject == 0 {
-            return false
-        }
+        if serviceObject == 0 { return false }
 
         return IOServiceOpen(serviceObject, mach_task_self_, 0, &connect) == KERN_SUCCESS
     }

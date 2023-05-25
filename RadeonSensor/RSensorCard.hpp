@@ -3,7 +3,6 @@
 
 #ifndef RadeonCard_hpp
 #define RadeonCard_hpp
-
 #include <IOKit/IOService.h>
 #include <IOKit/pci/IOPCIDevice.h>
 

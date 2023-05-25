@@ -7,9 +7,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var statusBar: StatusBarController?
 
     static var shared: AppDelegate {
-        guard let delegate = NSApp.delegate as? AppDelegate else {
-            fatalError("Invalid delegate")
-        }
+        guard let delegate = NSApp.delegate as? AppDelegate else { fatalError("Invalid delegate") }
         return delegate
     }
 
@@ -20,7 +18,5 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func applicationWillTerminate(_ aNotification: Notification) {}
 
-    func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool {
-        return true
-    }
+    func applicationSupportsSecureRestorableState(_ app: NSApplication) -> Bool { return true }
 }

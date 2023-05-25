@@ -3,7 +3,6 @@
 
 #ifndef KeyImplementations_hpp
 #define KeyImplementations_hpp
-
 #include "SMCRadeonGPU.hpp"
 #include <VirtualSMCSDK/AppleSmc.h>
 

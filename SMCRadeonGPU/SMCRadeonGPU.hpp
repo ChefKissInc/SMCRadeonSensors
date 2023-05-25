@@ -3,7 +3,6 @@
 
 #ifndef SMCRadeonGPU_hpp
 #define SMCRadeonGPU_hpp
-
 #include <kern_rsensor.hpp>
 #include <VirtualSMCSDK/kern_vsmcapi.hpp>
 #include <VirtualSMCSDK/AppleSmc.h>
