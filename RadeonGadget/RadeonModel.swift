@@ -37,7 +37,7 @@ class RadeonModel {
         _ = IOConnectCallMethod(
             connect, RadeonSensorSelector.getVersion.rawValue, nil, 0, nil, 0, nil, nil, &outputStr, &outputStrCount)
 
-        let version = String(cString: Array(outputStr[0 ... outputStrCount - 1])).components(separatedBy: ".")
+        let version = String(cString: Array(outputStr[0...outputStrCount - 1])).components(separatedBy: ".")
         if version.count <= 1 { self.alert("Invalid kext version", critical: true) }
         return (Int(version[0]) ?? 0, Int(version[1]) ?? 0)
     }

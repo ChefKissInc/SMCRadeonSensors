@@ -13,5 +13,5 @@
     "prioritizeKeepingFunctionOutputTogether": false,
     "indentConditionalCompilationBlocks": true,
     "lineBreakAroundMultilineExpressionChainComponents": true,
-    "spacesAroundRangeFormationOperators": true
+    "spacesAroundRangeFormationOperators": false
 }

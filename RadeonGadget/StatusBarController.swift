@@ -50,7 +50,7 @@ private class StatusbarView: NSView {
             self.drawTitle("NONE", x: 35.0)
             return
         }
-        for i in 0 ... gpuCount - 1 {
+        for i in 0...(gpuCount - 1) {
             var temp: String
             if i >= self.temps.count || self.temps[i] == 255 {
                 temp = "-  "
