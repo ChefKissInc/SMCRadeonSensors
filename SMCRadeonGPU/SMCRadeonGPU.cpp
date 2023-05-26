@@ -4,6 +4,7 @@
 #include "SMCRadeonGPU.hpp"
 #include "KeyImplementations.hpp"
 #include <Headers/kern_util.hpp>
+#include <Headers/kern_version.hpp>
 
 OSDefineMetaClassAndStructors(SMCRadeonGPU, IOService);
 
@@ -43,7 +44,7 @@ bool SMCRadeonGPU::start(IOService *provider) {
         return false;
     }
 
-    this->setProperty("VersionInfo", xStringify(MODULE_VERSION));
+    this->setProperty("VersionInfo", kextVersion);
 
     this->vsmcNotifier = VirtualSMCAPI::registerHandler(vsmcNotificationHandler, this);
     if (!this->vsmcNotifier) {
