@@ -14,8 +14,8 @@ class EXPORT RadeonSensor : public IOService {
     bool start(IOService *provider) override;
     void free() override;
 
-    UInt16 getTemperature(UInt16 card);
-    UInt16 getCardCount();
+    virtual UInt16 getTemperature(UInt16 card);
+    virtual UInt16 getCardCount();
 };
 
 struct RSensor {

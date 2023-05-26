@@ -19,11 +19,6 @@ enum struct ChipFamily {
 class RSensorCard : public OSObject {
     OSDeclareDefaultStructors(RSensorCard);
 
-    public:
-    bool initialise(IOPCIDevice *radeonDevice);
-    IOReturn getTemperature(UInt16 *data);
-
-    private:
     UInt32 deviceId {0};
     ChipFamily chipFamily {ChipFamily::Unknown};
 
@@ -41,6 +36,10 @@ class RSensorCard : public OSObject {
     IOReturn tahitiTemperature(UInt16 *data);
     IOReturn arcticTemperature(UInt16 *data);
     IOReturn vegaTemperature(UInt16 *data);
+
+    public:
+    bool initialise(IOPCIDevice *radeonDevice);
+    IOReturn getTemperature(UInt16 *data);
 };
 
 #endif /* RadeonCard.hpp */
