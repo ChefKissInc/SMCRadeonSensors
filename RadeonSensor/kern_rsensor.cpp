@@ -23,11 +23,8 @@ void RSensor::populateCards() {
     if (videoBuiltin &&
         WIOKit::readPCIConfigValue(videoBuiltin, WIOKit::kIOPCIConfigVendorID) == WIOKit::VendorID::ATIAMD) {
         auto *card = new RSensorCard();
-        if (!card || !card->initialise(videoBuiltin)) {
-            OSSafeReleaseNULL(card);
-        } else {
-            this->cards->setObject(card);
-        }
+        if (card && card->initialise(videoBuiltin)) { this->cards->setObject(card); }
+        OSSafeReleaseNULL(card);
     }
     for (size_t i = 0; i < devInfo->videoExternal.size(); i++) {
         auto *obj = OSDynamicCast(IOPCIDevice, devInfo->videoExternal[i].video);
@@ -38,6 +35,7 @@ void RSensor::populateCards() {
                 continue;
             }
             this->cards->setObject(card);
+            card->release();
         }
     }
     DBGLOG("rsensor", "Found %lu cards", this->radeonCards->getCount());
