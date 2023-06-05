@@ -18,7 +18,7 @@ Apple stopped reporting the temperature since the Radeon VII. Vega 10 and older 
 
 ## Supported GPUs
 
-All AMD GPUs starting with Radeon HD 7000 series up to the RX 6000 series are supported on macOS 10.15 and newer.
+All AMD GPUs starting with Radeon HD 7000 series up to the RX 6000 series, and all Vega iGPUs are supported on macOS 10.15 and newer.
 
 ### Credits
 
