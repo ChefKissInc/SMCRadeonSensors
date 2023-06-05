@@ -7,8 +7,10 @@
 
 OSDefineMetaClassAndStructors(RSensorCard, OSObject);
 
-bool RSensorCard::initialise(IOPCIDevice *radeonDevice) {
-    this->deviceId = WIOKit::readPCIConfigValue(radeonDevice, WIOKit::kIOPCIConfigDeviceID);
+bool RSensorCard::initialise(IOPCIDevice *device) {
+    WIOKit::awaitPublishing(device);
+    this->deviceId = WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigDeviceID);
+    device->setMemoryEnable(true);
 
     if ((this->deviceId >= 0x7301 && this->deviceId <= 0x73FF)) {
         chipFamily = ChipFamily::Navi;
@@ -41,8 +43,7 @@ bool RSensorCard::initialise(IOPCIDevice *radeonDevice) {
     }
 
     auto bar5 = chipFamily >= ChipFamily::SouthernIslands;
-    radeonDevice->setMemoryEnable(true);
-    this->rmmio = radeonDevice->mapDeviceMemoryWithRegister(bar5 ? kIOPCIConfigBaseAddress5 : kIOPCIConfigBaseAddress2);
+    this->rmmio = device->mapDeviceMemoryWithRegister(bar5 ? kIOPCIConfigBaseAddress5 : kIOPCIConfigBaseAddress2);
     if (!this->rmmio || !this->rmmio->getLength()) {
         SYSLOG("rsensor", "Failed to map BAR%d", bar5 ? 5 : 2);
         return false;

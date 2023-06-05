@@ -17,22 +17,22 @@ IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
         return nullptr;
     }
 
-    this->fProvider = OSDynamicCast(RadeonSensor, provider);
-    if (!this->fProvider) {
+    this->rsensor = OSDynamicCast(RadeonSensor, provider);
+    if (!this->rsensor) {
         SYSLOG("init", "Null fProvider");
         return nullptr;
     }
 
-    auto gpuCount = this->fProvider->getCardCount();
+    auto gpuCount = this->rsensor->getCardCount();
     for (auto i = 0; i < gpuCount; i++) {
         VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->rsensor, i)));
         VirtualSMCAPI::addKey(KeyTGxP(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->rsensor, i)));
         VirtualSMCAPI::addKey(KeyTGxd(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->rsensor, i)));
         VirtualSMCAPI::addKey(KeyTGxp(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->fProvider, i)));
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->rsensor, i)));
     }
 
     return this;

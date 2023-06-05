@@ -2,7 +2,7 @@
 //  details.
 
 #include "RSensorCard.hpp"
-#include "kern_rsensor.hpp"
+#include "RSensor.hpp"
 #include <Headers/kern_api.hpp>
 #include <Headers/kern_version.hpp>
 #include <Headers/plugin_start.hpp>

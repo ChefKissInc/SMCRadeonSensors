@@ -1,7 +1,7 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#include "RadeonSensorUserClient.hpp"
+#include "RadeonSensorUC.hpp"
 #include <Headers/kern_util.hpp>
 #include <IOKit/IOLib.h>
 
@@ -13,37 +13,33 @@ bool RadeonSensorUserClient::initWithTask(task_t owningTask, void *securityToken
     if (!owningTask) return false;
 
     if (!super::initWithTask(owningTask, securityToken, type)) {
-        IOLog("RadeonSensorUserClient::initWithTask: super::initWithTask failed\n");
+        SYSLOG("rsensoruc", "super::initWithTask failed\n");
         return false;
     }
 
-    IOLog("RadeonSensorUserClient::initWithTask\n");
-
-    mTask = owningTask;
-    mProvider = NULL;
+    this->owningTask = owningTask;
+    this->rsensor = nullptr;
 
     return true;
 }
 
 bool RadeonSensorUserClient::start(IOService *provider) {
     if (!super::start(provider)) {
-        IOLog("RadeonSensorUserClient::start: super::start failed\n");
+        SYSLOG("rsensoruc", "super::start failed\n");
         return false;
     }
 
-    this->mProvider = OSDynamicCast(RadeonSensor, provider);
-    if (!this->mProvider) {
-        IOLog("RadeonSensorUserClient::initWithTask: null mProvider\n");
+    this->rsensor = OSDynamicCast(RadeonSensor, provider);
+    if (!this->rsensor) {
+        SYSLOG("rsensoruc", "null mProvider\n");
         return false;
     }
 
-    IOLog("RadeonSensorUserClient::start\n");
     return true;
 }
 
 void RadeonSensorUserClient::stop(IOService *provider) {
-    IOLog("RadeonSensorUserClient::stop\n");
-    this->mProvider = nullptr;
+    this->rsensor = nullptr;
     super::stop(provider);
 }
 
@@ -53,7 +49,7 @@ IOReturn RadeonSensorUserClient::externalMethod(uint32_t selector, IOExternalMet
     switch (selector) {
         case RadeonSensorSelector::GetVersionLength: {
             arguments->scalarOutputCount = 1;
-            arguments->scalarOutput[0] = sizeof(version);
+            *arguments->scalarOutput = sizeof(version);
             arguments->structureOutputSize = 0;
             break;
         }
@@ -65,17 +61,16 @@ IOReturn RadeonSensorUserClient::externalMethod(uint32_t selector, IOExternalMet
         }
         case RadeonSensorSelector::GetCardCount: {
             arguments->scalarOutputCount = 1;
-            arguments->scalarOutput[0] = this->mProvider->getCardCount();
+            *arguments->scalarOutput = this->rsensor->getCardCount();
             arguments->structureOutputSize = 0;
             break;
         }
         case RadeonSensorSelector::GetTemperatures: {
-            UInt16 cardCount = this->mProvider->getCardCount();
+            UInt16 cardCount = this->rsensor->getCardCount();
             arguments->scalarOutputCount = 0;
-
             arguments->structureOutputSize = cardCount * sizeof(UInt16);
             for (size_t i = 0; i < cardCount; i++) {
-                static_cast<UInt16 *>(arguments->structureOutput)[i] = this->mProvider->getTemperature(i);
+                static_cast<UInt16 *>(arguments->structureOutput)[i] = this->rsensor->getTemperature(i);
             }
             break;
         }

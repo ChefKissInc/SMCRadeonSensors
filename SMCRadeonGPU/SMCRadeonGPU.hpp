@@ -2,9 +2,9 @@
 //  details.
 
 #pragma once
+#include <RSensor.hpp>
 #include <VirtualSMCSDK/kern_vsmcapi.hpp>
 #include <VirtualSMCSDK/AppleSmc.h>
-#include <kern_rsensor.hpp>
 
 class EXPORT SMCRadeonGPU : public IOService {
     OSDeclareDefaultStructors(SMCRadeonGPU);
@@ -23,7 +23,7 @@ class EXPORT SMCRadeonGPU : public IOService {
         VirtualSMCAPI::Version,
     };
 
-    RadeonSensor *fProvider {nullptr};
+    RadeonSensor *rsensor {nullptr};
     IONotifier *vsmcNotifier {nullptr};
 
     public:
