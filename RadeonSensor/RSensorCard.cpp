@@ -58,78 +58,59 @@ IOReturn RSensorCard::getTemperature(UInt16 *data) {
         case ChipFamily::SeaIslands:
             [[fallthrough]];
         case ChipFamily::SouthernIslands:
-            return getTempSI(data);
+            return this->getTempSI(data);
         case ChipFamily::VolcanicIslands:
-            return getTempVI(data);
+            return this->getTempVI(data);
         case ChipFamily::ArcticIslands:
             [[fallthrough]];
         case ChipFamily::Navi:
-            return getTempAI(data);
+            return this->getTempAI(data);
         case ChipFamily::Raven:
-            return getTempRV(data);
+            return this->getTempRV(data);
         default:
             return kIOReturnError;
     }
 }
 
-UInt32 RSensorCard::readIndirect(UInt32 reg) {
+UInt32 RSensorCard::readIndirectSMCSI(UInt32 reg) {
+    writeReg32(mmSMC_IND_INDEX_0, reg);
+    return readReg32(mmSMC_IND_DATA_0);
+}
+
+UInt32 RSensorCard::readIndirectSMCVI(UInt32 reg) {
     writeReg32(mmSMC_IND_INDEX_11, reg);
     return readReg32(mmSMC_IND_DATA_11);
 }
 
 UInt32 RSensorCard::readReg32(UInt32 reg) {
-    if (reg * 4 < this->rmmio->getLength()) {
+    auto soc15plus = this->chipFamily >= ChipFamily::ArcticIslands;
+    if ((reg * 4) < this->rmmio->getLength()) {
         return this->rmmioPtr[reg];
     } else {
-        this->rmmioPtr[mmPCIE_INDEX2] = reg;
-        return this->rmmioPtr[mmPCIE_DATA2];
+        this->rmmioPtr[soc15plus ? mmPCIE_INDEX2 : mmPCIE_INDEX] = reg;
+        return this->rmmioPtr[soc15plus ? mmPCIE_DATA2 : mmPCIE_DATA];
     }
 }
 
 void RSensorCard::writeReg32(UInt32 reg, UInt32 val) {
+    auto soc15plus = this->chipFamily >= ChipFamily::ArcticIslands;
     if ((reg * 4) < this->rmmio->getLength()) {
         this->rmmioPtr[reg] = val;
     } else {
-        this->rmmioPtr[mmPCIE_INDEX2] = reg;
-        this->rmmioPtr[mmPCIE_DATA2] = val;
+        this->rmmioPtr[soc15plus ? mmPCIE_INDEX2 : mmPCIE_INDEX] = reg;
+        this->rmmioPtr[soc15plus ? mmPCIE_DATA2 : mmPCIE_DATA] = val;
     }
 }
 
 IOReturn RSensorCard::getTempSI(UInt16 *data) {
-    UInt32 temp, actual_temp = 0;
-    for (int i = 0; i < 1000; i++) {    // attempts to ready
-        temp = (readReg32(CG_SI_THERMAL_STATUS) & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT;
-        if ((temp >> 10) & 1) {
-            actual_temp = 0;
-        } else if ((temp >> 9) & 1) {
-            actual_temp = 255;
-        } else {
-            actual_temp = temp;    //(temp >> 1) & 0xff;
-            break;
-        }
-        IOSleep(10);
-    }
-
-    *data = (UInt16)(actual_temp & 0x1ff);
+    UInt32 regValue = readIndirectSMCSI(ixCG_MULT_THERMAL_STATUS);
+    *data = (regValue & 0x200) ? 255 : (regValue & 0x1FF);
     return kIOReturnSuccess;
 }
 
 IOReturn RSensorCard::getTempVI(UInt16 *data) {
-    UInt32 temp, actual_temp = 0;
-    for (int i = 0; i < 1000; i++) {    // attempts to ready
-        temp = (readIndirect(CG_CI_MULT_THERMAL_STATUS) & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT;
-        if ((temp >> 10) & 1) {
-            actual_temp = 0;
-        } else if ((temp >> 9) & 1) {
-            actual_temp = 255;
-        } else {
-            actual_temp = temp & 0x1ff;    //(temp >> 1) & 0xff;
-            break;
-        }
-        IOSleep(10);
-    }
-
-    *data = (UInt16)(actual_temp & 0x1ff);
+    UInt32 regValue = readIndirectSMCVI(ixCG_MULT_THERMAL_STATUS);
+    *data = (regValue & 0x200) ? 255 : (regValue & 0x1FF);
     return kIOReturnSuccess;
 }
 
