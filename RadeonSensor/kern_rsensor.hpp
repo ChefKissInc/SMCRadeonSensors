@@ -1,8 +1,7 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#ifndef kern_rsensor_hpp
-#define kern_rsensor_hpp
+#pragma once
 #include <Headers/kern_iokit.hpp>
 #include <IOKit/IOService.h>
 
@@ -25,5 +24,3 @@ struct RSensor {
     void deinit();
     void populateCards();
 };
-
-#endif /* kern_rsensor.hpp */

@@ -1,8 +1,7 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#ifndef RadeonCard_hpp
-#define RadeonCard_hpp
+#pragma once
 #include <IOKit/IOService.h>
 #include <IOKit/pci/IOPCIDevice.h>
 
@@ -26,7 +25,8 @@ class RSensorCard : public OSObject {
     IOMemoryMap *rmmio {nullptr};
     int cardNumber {0};
 
-    UInt32 readIndirect(UInt32 reg);
+    UInt32 readIndirectSMCSI(UInt32 reg);
+    UInt32 readIndirectSMCVI(UInt32 reg);
     UInt32 readReg32(UInt32 reg);
     void writeReg32(UInt32 reg, UInt32 val);
 
@@ -39,5 +39,3 @@ class RSensorCard : public OSObject {
     bool initialise(IOPCIDevice *radeonDevice);
     IOReturn getTemperature(UInt16 *data);
 };
-
-#endif /* RadeonCard.hpp */

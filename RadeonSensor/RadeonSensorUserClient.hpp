@@ -1,8 +1,7 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#ifndef RadeonSensorUserClient_hpp
-#define RadeonSensorUserClient_hpp
+#pragma once
 #include "kern_rsensor.hpp"
 #include <IOKit/IOService.h>
 #include <IOKit/IOUserClient.h>
@@ -33,5 +32,3 @@ class RadeonSensorUserClient : public IOUserClient {
     virtual IOReturn externalMethod(uint32_t selector, IOExternalMethodArguments *arguments,
         IOExternalMethodDispatch *dispatch, OSObject *target, void *reference) override;
 };
-
-#endif /* RadeonSensorUserClient.hpp */

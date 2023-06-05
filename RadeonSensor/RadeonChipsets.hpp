@@ -1,8 +1,7 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#ifndef RadeonChipsets_hpp
-#define RadeonChipsets_hpp
+#pragma once
 #include <Headers/kern_util.hpp>
 
 constexpr UInt32 CG_SI_THERMAL_STATUS = 0x714;
@@ -34,5 +33,3 @@ constexpr UInt32 CUR_TEMP_MASK = 0xFFE00000;
 constexpr UInt32 mmCG_MULT_THERMAL_STATUS = 0x5A;
 constexpr UInt32 CTF_TEMP_SHIFT = 9;
 constexpr UInt32 CTF_TEMP_MASK = 0x3FE00;
-
-#endif /* RadeonChipsets.hpp */

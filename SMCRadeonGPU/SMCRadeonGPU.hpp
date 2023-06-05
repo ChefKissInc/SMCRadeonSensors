@@ -1,8 +1,7 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#ifndef SMCRadeonGPU_hpp
-#define SMCRadeonGPU_hpp
+#pragma once
 #include <VirtualSMCSDK/kern_vsmcapi.hpp>
 #include <VirtualSMCSDK/AppleSmc.h>
 #include <kern_rsensor.hpp>
@@ -35,5 +34,3 @@ class EXPORT SMCRadeonGPU : public IOService {
 
     static bool vsmcNotificationHandler(void *target, void *refCon, IOService *newService, IONotifier *notifier);
 };
-
-#endif /* SMCRadeonGPU_hpp */

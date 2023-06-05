@@ -1,8 +1,7 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#ifndef KeyImplementations_hpp
-#define KeyImplementations_hpp
+#pragma once
 #include "SMCRadeonGPU.hpp"
 #include <VirtualSMCSDK/AppleSmc.h>
 
@@ -21,5 +20,3 @@ class RGPUTempValue : public RadeonSMCValue {
     protected:
     SMC_RESULT readAccess() override;
 };
-
-#endif /* KeyImplementations_hpp */
