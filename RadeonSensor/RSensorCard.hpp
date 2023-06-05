@@ -22,20 +22,18 @@ class RSensorCard : public OSObject {
     UInt32 deviceId {0};
     ChipFamily chipFamily {ChipFamily::Unknown};
 
-    volatile UInt8 *mmioBase {nullptr};
-    IOMemoryMap *mmioMap {nullptr};
-    UInt32 caps {0};
-    UInt32 tReg {0};
+    volatile UInt32 *rmmioPtr {nullptr};
+    IOMemoryMap *rmmio {nullptr};
     int cardNumber {0};
 
-    UInt32 read32(UInt32 reg);
-    void write32(UInt32 reg, UInt32 val);
-    UInt32 read_ind(UInt32 reg);
-    UInt32 read_smc(UInt32 reg);
+    UInt32 readIndirect(UInt32 reg);
+    UInt32 readReg32(UInt32 reg);
+    void writeReg32(UInt32 reg, UInt32 val);
 
-    IOReturn tahitiTemperature(UInt16 *data);
-    IOReturn arcticTemperature(UInt16 *data);
-    IOReturn vegaTemperature(UInt16 *data);
+    IOReturn getTempSI(UInt16 *data);
+    IOReturn getTempVI(UInt16 *data);
+    IOReturn getTempAI(UInt16 *data);
+    IOReturn getTempRV(UInt16 *data);
 
     public:
     bool initialise(IOPCIDevice *radeonDevice);

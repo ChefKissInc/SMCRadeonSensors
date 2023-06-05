@@ -40,23 +40,15 @@ bool RSensorCard::initialise(IOPCIDevice *radeonDevice) {
         return false;
     }
 
-    if (chipFamily >= ChipFamily::SouthernIslands) {
-        this->mmioMap = radeonDevice->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress5);
-        if (!this->mmioMap || !this->mmioMap->getLength()) {
-            DBGLOG("rsensor", "Failed to map BAR5");
-            return false;
-        }
-        this->mmioBase = reinterpret_cast<volatile UInt8 *>(this->mmioMap->getVirtualAddress());
-        DBGLOG("rsensor", "Using BAR5, located at %p", this->mmioBase);
-    } else {
-        this->mmioMap = radeonDevice->mapDeviceMemoryWithRegister(kIOPCIConfigBaseAddress2);
-        if (!this->mmioMap || !this->mmioMap->getLength()) {
-            DBGLOG("rsensor", "Failed to map BAR2");
-            return false;
-        }
-        this->mmioBase = reinterpret_cast<volatile UInt8 *>(this->mmioMap->getVirtualAddress());
-        DBGLOG("rsensor", "Using BAR2, located at %p", this->mmioBase);
+    auto bar5 = chipFamily >= ChipFamily::SouthernIslands;
+    radeonDevice->setMemoryEnable(true);
+    this->rmmio = radeonDevice->mapDeviceMemoryWithRegister(bar5 ? kIOPCIConfigBaseAddress5 : kIOPCIConfigBaseAddress2);
+    if (!this->rmmio || !this->rmmio->getLength()) {
+        SYSLOG("rsensor", "Failed to map BAR%d", bar5 ? 5 : 2);
+        return false;
     }
+    this->rmmioPtr = reinterpret_cast<volatile UInt32 *>(this->rmmio->getVirtualAddress());
+    DBGLOG("rsensor", "Using BAR%, located at %p", bar5 ? 5 : 2, this->mmioBase);
 
     return true;
 }
@@ -66,45 +58,47 @@ IOReturn RSensorCard::getTemperature(UInt16 *data) {
         case ChipFamily::SeaIslands:
             [[fallthrough]];
         case ChipFamily::SouthernIslands:
-            return tahitiTemperature(data);
+            return getTempSI(data);
         case ChipFamily::VolcanicIslands:
-            return arcticTemperature(data);
+            return getTempVI(data);
         case ChipFamily::ArcticIslands:
             [[fallthrough]];
-        case ChipFamily::Raven:
-            [[fallthrough]];
         case ChipFamily::Navi:
-            return vegaTemperature(data);
+            return getTempAI(data);
+        case ChipFamily::Raven:
+            return getTempRV(data);
         default:
             return kIOReturnError;
     }
 }
 
-UInt32 RSensorCard::read_smc(UInt32 reg) {
-    UInt32 r;
-    write32(SMC_IND_INDEX_0, (reg));
-    r = read32(SMC_IND_DATA_0);
-    return r;
+UInt32 RSensorCard::readIndirect(UInt32 reg) {
+    writeReg32(mmSMC_IND_INDEX_11, reg);
+    return readReg32(mmSMC_IND_DATA_11);
 }
 
-UInt32 RSensorCard::read_ind(UInt32 reg) {
-    // unsigned long flags;
-    UInt32 r;
-    // spin_lock_irqsave(&rdev->smc_idx_lock, flags);
-    write32(mmSMC_IND_INDEX_11, reg);
-    r = read32(mmSMC_IND_DATA_11);
-    // spin_unlock_irqrestore(&rdev->smc_idx_lock, flags);
-    return r;
+UInt32 RSensorCard::readReg32(UInt32 reg) {
+    if (reg * 4 < this->rmmio->getLength()) {
+        return this->rmmioPtr[reg];
+    } else {
+        this->rmmioPtr[mmPCIE_INDEX2] = reg;
+        return this->rmmioPtr[mmPCIE_DATA2];
+    }
 }
 
-UInt32 RSensorCard::read32(UInt32 reg) { return OSReadLittleInt32((mmioBase), reg); }
+void RSensorCard::writeReg32(UInt32 reg, UInt32 val) {
+    if ((reg * 4) < this->rmmio->getLength()) {
+        this->rmmioPtr[reg] = val;
+    } else {
+        this->rmmioPtr[mmPCIE_INDEX2] = reg;
+        this->rmmioPtr[mmPCIE_DATA2] = val;
+    }
+}
 
-void RSensorCard::write32(UInt32 reg, UInt32 val) { return OSWriteLittleInt32((mmioBase), reg, val); }
-
-IOReturn RSensorCard::tahitiTemperature(UInt16 *data) {
+IOReturn RSensorCard::getTempSI(UInt16 *data) {
     UInt32 temp, actual_temp = 0;
     for (int i = 0; i < 1000; i++) {    // attempts to ready
-        temp = (read32(CG_SI_THERMAL_STATUS) & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT;
+        temp = (readReg32(CG_SI_THERMAL_STATUS) & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT;
         if ((temp >> 10) & 1) {
             actual_temp = 0;
         } else if ((temp >> 9) & 1) {
@@ -117,14 +111,13 @@ IOReturn RSensorCard::tahitiTemperature(UInt16 *data) {
     }
 
     *data = (UInt16)(actual_temp & 0x1ff);
-    // data[1] = 0;
     return kIOReturnSuccess;
 }
 
-IOReturn RSensorCard::arcticTemperature(UInt16 *data) {
+IOReturn RSensorCard::getTempVI(UInt16 *data) {
     UInt32 temp, actual_temp = 0;
     for (int i = 0; i < 1000; i++) {    // attempts to ready
-        temp = (read_ind(CG_CI_MULT_THERMAL_STATUS) & CI_CTF_TEMP_MASK) >> CI_CTF_TEMP_SHIFT;
+        temp = (readIndirect(CG_CI_MULT_THERMAL_STATUS) & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT;
         if ((temp >> 10) & 1) {
             actual_temp = 0;
         } else if ((temp >> 9) & 1) {
@@ -137,16 +130,17 @@ IOReturn RSensorCard::arcticTemperature(UInt16 *data) {
     }
 
     *data = (UInt16)(actual_temp & 0x1ff);
-    // data[1] = 0;
     return kIOReturnSuccess;
 }
 
-IOReturn RSensorCard::vegaTemperature(UInt16 *data) {
-    UInt32 temp, actual_temp = 0;
+IOReturn RSensorCard::getTempAI(UInt16 *data) {
+    *data = ((readReg32(THM_BASE + mmCG_MULT_THERMAL_STATUS) & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT) & 0x1FF;
+    return kIOReturnSuccess;
+}
 
-    temp = read32(mmTHM_TCON_CUR_TMP) >> THM_TCON_CUR_TMP__CUR_TEMP__SHIFT;
-    actual_temp = temp & 0x1ff;
-    *data = (UInt16)actual_temp;
-
+IOReturn RSensorCard::getTempRV(UInt16 *data) {
+    auto regValue = readReg32(THM_BASE + mmTHM_TCON_CUR_TMP);
+    *data = ((regValue & CUR_TEMP_MASK) >> CUR_TEMP_SHIFT) / 8;
+    if (regValue & CUR_TEMP_RANGE_SEL_MASK) { *data -= 49; }
     return kIOReturnSuccess;
 }
