@@ -1,8 +1,8 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#include "RSensorCard.hpp"
 #include "RSensor.hpp"
+#include "RSensorCard.hpp"
 #include <Headers/kern_api.hpp>
 #include <Headers/kern_version.hpp>
 #include <Headers/plugin_start.hpp>
@@ -32,7 +32,7 @@ PluginConfiguration ADDPR(config) {
     bootargBeta,
     arrsize(bootargBeta),
     KernelVersion::Catalina,
-    KernelVersion::Ventura,
+    KernelVersion::Sonoma,
     []() { rsensor.init(); },
 };
 
