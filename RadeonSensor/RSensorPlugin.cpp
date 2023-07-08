@@ -66,7 +66,7 @@ UInt16 PRODUCT_NAME::getTemperature(UInt16 card) {
     auto *obj = OSDynamicCast(RSensorCard, rsensor.cards->getObject(card));
     if (!obj) { return 0xFF; }
     UInt16 temp = 0;
-    obj->getTemperature(&temp);
+    if (obj->getTemperature(&temp) != kIOReturnSuccess) { return 0xFF; }
     return temp;
 }
 

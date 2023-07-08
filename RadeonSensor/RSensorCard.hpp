@@ -18,11 +18,13 @@ enum struct ChipFamily {
 class RSensorCard : public OSObject {
     OSDeclareDefaultStructors(RSensorCard);
 
-    UInt32 deviceId {0};
     ChipFamily chipFamily {ChipFamily::Unknown};
 
+    IOPCIDevice *dev {nullptr};
     volatile UInt32 *rmmioPtr {nullptr};
     IOMemoryMap *rmmio {nullptr};
+
+    IOReturn setRMMIOIfNecessary();
 
     UInt32 readIndirectSMCSI(UInt32 reg);
     UInt32 readIndirectSMCVI(UInt32 reg);
