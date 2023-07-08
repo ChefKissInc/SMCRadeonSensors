@@ -2,10 +2,14 @@
 
 ## 1.1.0 (08/07/2023)
 
-- Fixed temperature readings on Navi
-- Ensured the driver won’t fail randomly if we try mapping RMMIO too early
+### Bug fixes
+
+- Temperature readings on Navi were broken
+- RSensorCard would sometimes fail because RMMIO was mapped too early
 
 ## 1.0.0 (24/06/2023)
+
+### Enhancements
 
 - Major code rewrite
 - Improved temperature reading logic
