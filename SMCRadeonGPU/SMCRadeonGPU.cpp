@@ -35,6 +35,9 @@ IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->rsensor, i)));
     }
 
+    qsort(const_cast<VirtualSMCKeyValue *>(vsmcPlugin.data.data()), vsmcPlugin.data.size(), sizeof(VirtualSMCKeyValue),
+        VirtualSMCKeyValue::compare);
+
     return this;
 }
 
