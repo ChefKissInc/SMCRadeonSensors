@@ -13,13 +13,13 @@ uint32_t ADDPR(debugPrintDelay) = 0;
 
 IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
     if (!IOService::probe(provider, score)) {
-        SYSLOG("init", "Failed to probe the parent");
+        SYSLOG("init", "super::probe failed");
         return nullptr;
     }
 
     this->rsensor = OSDynamicCast(RadeonSensor, provider);
     if (!this->rsensor) {
-        SYSLOG("init", "Null fProvider");
+        SYSLOG("init", "Null rsensor");
         return nullptr;
     }
 
@@ -40,7 +40,7 @@ IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
 
 bool SMCRadeonGPU::start(IOService *provider) {
     if (!IOService::start(provider)) {
-        SYSLOG("init", "Failed to start the parent");
+        SYSLOG("init", "super::start failed");
         return false;
     }
 
@@ -48,7 +48,7 @@ bool SMCRadeonGPU::start(IOService *provider) {
 
     this->vsmcNotifier = VirtualSMCAPI::registerHandler(vsmcNotificationHandler, this);
     if (!this->vsmcNotifier) {
-        SYSLOG("init", "Failed to register notification handler");
+        SYSLOG("init", "VirtualSMCAPI::registerHandler failed");
         return false;
     }
 

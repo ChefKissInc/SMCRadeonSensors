@@ -13,7 +13,7 @@ bool RadeonSensorUserClient::initWithTask(task_t owningTask, void *securityToken
     if (!owningTask) return false;
 
     if (!super::initWithTask(owningTask, securityToken, type)) {
-        SYSLOG("rsensoruc", "super::initWithTask failed\n");
+        SYSLOG("rsensoruc", "super::initWithTask failed");
         return false;
     }
 
@@ -25,13 +25,13 @@ bool RadeonSensorUserClient::initWithTask(task_t owningTask, void *securityToken
 
 bool RadeonSensorUserClient::start(IOService *provider) {
     if (!super::start(provider)) {
-        SYSLOG("rsensoruc", "super::start failed\n");
+        SYSLOG("rsensoruc", "super::start failed");
         return false;
     }
 
     this->rsensor = OSDynamicCast(RadeonSensor, provider);
     if (!this->rsensor) {
-        SYSLOG("rsensoruc", "null mProvider\n");
+        SYSLOG("rsensoruc", "null rsensor");
         return false;
     }
 
