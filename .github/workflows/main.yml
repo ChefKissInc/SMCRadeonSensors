@@ -64,7 +64,7 @@ jobs:
           src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/Lilu/master/Lilu/Scripts/bootstrap.sh) && eval "$src" || exit 1
       - name: VirtualSMC Bootstrap
         run: |
-          src=$(/usr/bin/curl -Lfs https://gist.githubusercontent.com/ChefKissInc/bdcee42642ded532d7950397d45123c0/raw/04200ccf5ed244376f03f0d1e7168a725c0654b0/BootstrapVirtualSMC.sh) && eval "$src" || exit 1
+          src=$(/usr/bin/curl -Lfs https://gist.githubusercontent.com/VisualEhrmanntraut/bdcee42642ded532d7950397d45123c0/raw/04200ccf5ed244376f03f0d1e7168a725c0654b0/BootstrapVirtualSMC.sh) && eval "$src" || exit 1
 
       - run: xcodebuild analyze -quiet -alltargets -configuration Debug CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
       - run: xcodebuild analyze -quiet -alltargets -configuration Release CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
