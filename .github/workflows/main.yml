@@ -28,7 +28,7 @@ jobs:
           src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/Lilu/master/Lilu/Scripts/bootstrap.sh) && eval "$src" || exit 1
       - name: VirtualSMC Bootstrap
         run: |
-          src=$(/usr/bin/curl -Lfs https://gist.githubusercontent.com/ChefKissInc/bdcee42642ded532d7950397d45123c0/raw/04200ccf5ed244376f03f0d1e7168a725c0654b0/BootstrapVirtualSMC.sh) && eval "$src" || exit 1
+          src=$(/usr/bin/curl -Lfs https://gist.githubusercontent.com/VisualEhrmanntraut/bdcee42642ded532d7950397d45123c0/raw/04200ccf5ed244376f03f0d1e7168a725c0654b0/BootstrapVirtualSMC.sh) && eval "$src" || exit 1
 
       - run: xcodebuild -alltargets -configuration Debug
       - run: xcodebuild -alltargets -configuration Release
