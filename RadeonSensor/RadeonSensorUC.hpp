@@ -2,7 +2,7 @@
 //  details.
 
 #pragma once
-#include "RSensor.hpp"
+#include "RadeonSensor.hpp"
 #include <IOKit/IOService.h>
 #include <IOKit/IOUserClient.h>
 
@@ -23,9 +23,10 @@ class RadeonSensorUserClient : public IOUserClient {
     task_t owningTask;
 
     public:
-    bool initWithTask(task_t owningTask, void *securityToken, UInt32 type, OSDictionary *properties) override;
-    void stop(IOService *provider) override;
-    bool start(IOService *provider) override;
+    bool initWithTask(task_t owningTask, void *securityToken, UInt32 type,
+        OSDictionary *properties) APPLE_KEXT_OVERRIDE;
+    void stop(IOService *provider) APPLE_KEXT_OVERRIDE;
+    bool start(IOService *provider) APPLE_KEXT_OVERRIDE;
     IOReturn externalMethod(uint32_t selector, IOExternalMethodArguments *arguments, IOExternalMethodDispatch *dispatch,
-        OSObject *target, void *reference) override;
+        OSObject *target, void *reference) APPLE_KEXT_OVERRIDE;
 };

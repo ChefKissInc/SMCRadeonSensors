@@ -24,6 +24,7 @@ IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
     }
 
     auto gpuCount = this->rsensor->getCardCount();
+    DBGLOG("init", "Card count: %u", gpuCount);
     for (auto i = 0; i < gpuCount; i++) {
         VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->rsensor, i)));
@@ -33,6 +34,10 @@ IOService *SMCRadeonGPU::probe(IOService *provider, SInt32 *score) {
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->rsensor, i)));
         VirtualSMCAPI::addKey(KeyTGxp(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->rsensor, i)));
+        if (i == 0) {
+            VirtualSMCAPI::addKey(KeyTGDD, vsmcPlugin.data,
+                VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this->rsensor, i)));
+        }
     }
 
     qsort(const_cast<VirtualSMCKeyValue *>(vsmcPlugin.data.data()), vsmcPlugin.data.size(), sizeof(VirtualSMCKeyValue),
@@ -69,27 +74,22 @@ bool SMCRadeonGPU::vsmcNotificationHandler(void *target, void *, IOService *newS
     if (ret == kIOReturnSuccess) {
         DBGLOG("smcrgpu", "Submitted plugin");
         return true;
-    } else if (ret != kIOReturnUnsupported) {
-        DBGLOG("smcrgpu", "Plugin submission failure %X", ret);
-        return false;
-    } else {
-        DBGLOG("smcrgpu", "Plugin submitted to non-VSMC");
+    }
+    if (ret != kIOReturnUnsupported) {
+        SYSLOG("smcrgpu", "Plugin submission failure: 0x%X", ret);
         return false;
     }
+    SYSLOG("smcrgpu", "Plugin submitted to non-VSMC");
+    return false;
 }
 
 void SMCRadeonGPU::stop(IOService *) { PANIC("smcrgpu", "Called stop!!!"); }
 
 EXPORT extern "C" kern_return_t ADDPR(kern_start)(kmod_info_t *, void *) {
-    // Report success but actually do not start and let I/O Kit unload us.
-    // This works better and increases boot speed in some cases.
     lilu_get_boot_args("liludelay", &ADDPR(debugPrintDelay), sizeof(ADDPR(debugPrintDelay)));
     ADDPR(debugEnabled) =
         checkKernelArgument("-vsmcdbg") || checkKernelArgument("-rsensordbg") || checkKernelArgument("-liludbgall");
     return KERN_SUCCESS;
 }
 
-EXPORT extern "C" kern_return_t ADDPR(kern_stop)(kmod_info_t *, void *) {
-    // It is not safe to unload VirtualSMC plugins!
-    return KERN_FAILURE;
-}
+EXPORT extern "C" kern_return_t ADDPR(kern_stop)(kmod_info_t *, void *) { return KERN_FAILURE; }

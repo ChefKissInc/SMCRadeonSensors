@@ -62,7 +62,7 @@ IOReturn RSensorCard::setRMMIOIfNecessary() {
         OSSafeReleaseNULL(this->rmmio);
         return kIOReturnNoMemory;
     }
-    DBGLOG("rsensor", "Using BAR%, located at %p", bar5 ? 5 : 2, this->mmioBase);
+    DBGLOG("rsensor", "Using BAR%, located at %p", bar5 ? 5 : 2, this->rmmioPtr);
 
     return kIOReturnSuccess;
 }

@@ -2,7 +2,7 @@
 //  details.
 
 #pragma once
-#include <RSensor.hpp>
+#include <RadeonSensor.hpp>
 #include <VirtualSMCSDK/kern_vsmcapi.hpp>
 #include <VirtualSMCSDK/AppleSmc.h>
 
@@ -16,6 +16,7 @@ class EXPORT SMCRadeonGPU : public IOService {
     static constexpr SMC_KEY KeyTGxD(size_t i) { return SMC_MAKE_IDENTIFIER('T', 'G', KeyIndexes[i], 'D'); }
     static constexpr SMC_KEY KeyTGxp(size_t i) { return SMC_MAKE_IDENTIFIER('T', 'G', KeyIndexes[i], 'p'); }
     static constexpr SMC_KEY KeyTGxd(size_t i) { return SMC_MAKE_IDENTIFIER('T', 'G', KeyIndexes[i], 'd'); }
+    static constexpr SMC_KEY KeyTGDD = SMC_MAKE_IDENTIFIER('T', 'G', 'D', 'D');
 
     VirtualSMCAPI::Plugin vsmcPlugin {
         xStringify(PRODUCT_NAME),

@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.2.0 (11/09/2023)
+
+### Bug fixes
+
+- Code architecture bug caused SMCRadeonGPU to have no readings.
+
+### Enhancements
+
+- Implement TGDD SMC key
+
 ## 1.1.0 (08/07/2023)
 
 ### Bug fixes
