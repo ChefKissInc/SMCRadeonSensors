@@ -23,6 +23,7 @@ class RSensorCard : public OSObject {
     IOPCIDevice *dev {nullptr};
     volatile UInt32 *rmmioPtr {nullptr};
     IOMemoryMap *rmmio {nullptr};
+    bool thm11 = false;
 
     IOReturn setRMMIOIfNecessary();
 

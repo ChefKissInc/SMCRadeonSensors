@@ -28,8 +28,11 @@ bool RSensorCard::initialise(IOPCIDevice *device) {
             DBGLOG("RSCard", "Raven");
             return true;
         case 0x66A0 ... 0x66AF:
+            this->thm11 = true;
             [[fallthrough]];
         case 0x6860 ... 0x687F:
+            [[fallthrough]];
+        case 0x69A0 ... 0x69AF:
             this->chipFamily = ChipFamily::ArcticIslands;
             DBGLOG("RSCard", "Arctic Islands");
             return true;
@@ -153,7 +156,9 @@ IOReturn RSensorCard::getTempVI(UInt16 *data) {
 }
 
 IOReturn RSensorCard::getTempAI(UInt16 *data) {
-    *data = ((this->readReg32(THM_BASE + mmCG_MULT_THERMAL_STATUS) & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT) & 0x1FF;
+    auto regValue =
+        this->readReg32(THM_BASE + (this->thm11 ? mmCG_MULT_THERMAL_STATUS_THM11 : mmCG_MULT_THERMAL_STATUS_THM9));
+    *data = ((regValue & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT) & 0x1FF;
     return kIOReturnSuccess;
 }
 
