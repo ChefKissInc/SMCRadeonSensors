@@ -17,7 +17,7 @@ class RadeonModel {
     init() {
         if !self.initDriver() { self.alert("Please download RadeonSensor from the release page", critical: true) }
 
-        let gadgetVersion = (1, 2)
+        let gadgetVersion = (1, 3)
         let kextVersion = self.getKextVersion()
         if kextVersion.1 < gadgetVersion.1 || kextVersion.0 != gadgetVersion.0 {
             self.alert("Your RadeonSensor is incompatible with this version of RadeonGadget", critical: true)

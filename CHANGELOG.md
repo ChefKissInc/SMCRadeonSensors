@@ -4,12 +4,12 @@
 
 ### Bug fixes
 
-- Vega20-based dGPUs failed to read temperature
+- Vega20-based dGPUs failed to read temperature.
 
 ### Enhancements
 
-- Add Vega12-based GPU support 
-- Simplify RMMIO and IOPCIDevice filter logic
+- Add Vega12-based GPU support.
+- Simplify RMMIO and IOPCIDevice filter logic.
 
 ## 1.2.0 (13/09/2023)
 
@@ -35,4 +35,4 @@
 - Major code rewrite
 - Improve temperature reading logic
 - Add AMD iGPU support
-- Improve gadget app popover design
+- Improve gadget app pop-over design
