@@ -20,28 +20,31 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
 
     auto *dict = IOService::serviceMatching("IOPCIDevice");
     if (!dict) {
-        SYSLOG("rsensor", "Failed to create matching dict for IOPCIDevice");
+        SYSLOG("RSensor", "Failed to create matching dict for IOPCIDevice");
         return nullptr;
     }
     auto *iter = IOService::getMatchingServices(dict);
     dict->release();
     if (!iter) {
-        SYSLOG("rsensor", "Failed to get iterator over IOPCIDevice");
+        SYSLOG("RSensor", "Failed to get iterator over IOPCIDevice");
         return nullptr;
     }
     this->cards = OSArray::withCapacity(0);
     if (!this->cards) {
-        SYSLOG("rsensor", "Failed to allocate cards array");
+        SYSLOG("RSensor", "Failed to allocate cards array");
         iter->release();
         return nullptr;
     }
     for (auto *device = OSDynamicCast(IOPCIDevice, iter->getNextObject()); device;
          device = OSDynamicCast(IOPCIDevice, iter->getNextObject())) {
+        WIOKit::awaitPublishing(device);
         UInt32 vendorID = 0, classCode = 0;
         if (!WIOKit::getOSDataValue(device, "vendor-id", vendorID) || vendorID != WIOKit::VendorID::ATIAMD ||
             !WIOKit::getOSDataValue(device, "class-code", classCode) || classCode != WIOKit::ClassCode::VGAController) {
             continue;
         }
+        DBGLOG("RSensor", "vendorID: 0x%X", WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigVendorID));
+        DBGLOG("RSensor", "classCode: 0x%X", WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigClassCode));
         auto *card = new RSensorCard {};
         if (!card) { continue; }
         if (card->initialise(device)) { this->cards->setObject(card); }
@@ -54,18 +57,18 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
         return nullptr;
     }
 
-    DBGLOG("rsensor", "Found %lu cards", this->cards->getCount());
+    DBGLOG("RSensor", "Found %lu cards", this->cards->getCount());
 
     return this;
 }
 
 bool PRODUCT_NAME::start(IOService *provider) {
     if (!IOService::start(provider)) {
-        SYSLOG("rsensor", "Failed to start the parent");
+        SYSLOG("RSensor", "Failed to start the parent");
         return false;
     }
 
-    SYSLOG("rsensor", "Copyright 2023 ChefKiss Inc. If you've paid for this, you've been scammed.");
+    SYSLOG("RSensor", "Copyright 2023 ChefKiss Inc. If you've paid for this, you've been scammed.");
 
     this->registerService();
 
