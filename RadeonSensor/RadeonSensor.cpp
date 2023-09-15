@@ -38,13 +38,14 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
     for (auto *device = OSDynamicCast(IOPCIDevice, iter->getNextObject()); device;
          device = OSDynamicCast(IOPCIDevice, iter->getNextObject())) {
         WIOKit::awaitPublishing(device);
-        UInt32 vendorID = 0, classCode = 0;
-        if (!WIOKit::getOSDataValue(device, "vendor-id", vendorID) || vendorID != WIOKit::VendorID::ATIAMD ||
-            !WIOKit::getOSDataValue(device, "class-code", classCode) || classCode != WIOKit::ClassCode::VGAController) {
+        auto vendorID = WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigVendorID);
+        auto classCode = (WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigClassCode) >> 8) &
+                         WIOKit::ClassCode::PCISubclassMask;
+        if (vendorID != WIOKit::VendorID::ATIAMD ||
+            (classCode != WIOKit::ClassCode::DisplayController && classCode != WIOKit::ClassCode::VGAController &&
+                classCode != WIOKit::ClassCode::Ex3DController && classCode != WIOKit::ClassCode::XGAController)) {
             continue;
         }
-        DBGLOG("RSensor", "vendorID: 0x%X", WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigVendorID));
-        DBGLOG("RSensor", "classCode: 0x%X", WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigClassCode));
         auto *card = new RSensorCard {};
         if (!card) { continue; }
         if (card->initialise(device)) { this->cards->setObject(card); }

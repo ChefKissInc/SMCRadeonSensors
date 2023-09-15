@@ -25,8 +25,6 @@ class RSensorCard : public OSObject {
     IOMemoryMap *rmmio {nullptr};
     bool thm11 = false;
 
-    IOReturn setRMMIOIfNecessary();
-
     UInt32 readIndirectSMCSI(UInt32 reg);
     UInt32 readIndirectSMCVI(UInt32 reg);
     UInt32 readReg32(UInt32 reg);
