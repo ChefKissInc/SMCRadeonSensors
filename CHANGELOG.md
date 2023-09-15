@@ -1,6 +1,16 @@
-# Changelog
+# Change log
 
-## 1.2.0 (11/09/2023)
+## 1.3.0 (15/09/2023)
+
+### Bug fixes
+
+- Vega20-based dGPUs failed to read temperature
+
+### Enhancements
+
+- Add Vega12-based GPU support 
+
+## 1.2.0 (13/09/2023)
 
 ### Bug fixes
 
@@ -8,7 +18,7 @@
 
 ### Enhancements
 
-- Implement TGDD SMC key
+- Implement TGDD SMC key.
 
 ## 1.1.0 (08/07/2023)
 
@@ -22,6 +32,6 @@
 ### Enhancements
 
 - Major code rewrite
-- Improved temperature reading logic
-- Added AMD iGPU support
-- Improved gadget app popover design
+- Improve temperature reading logic
+- Add AMD iGPU support
+- Improve gadget app popover design
