@@ -9,6 +9,7 @@
 ### Enhancements
 
 - Add Vega12-based GPU support 
+- Simplify RMMIO and IOPCIDevice filter logic
 
 ## 1.2.0 (13/09/2023)
 
