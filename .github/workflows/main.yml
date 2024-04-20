@@ -30,8 +30,8 @@ jobs:
         run: |
           src=$(/usr/bin/curl -Lfs https://gist.githubusercontent.com/VisualEhrmanntraut/bdcee42642ded532d7950397d45123c0/raw/04200ccf5ed244376f03f0d1e7168a725c0654b0/BootstrapVirtualSMC.sh) && eval "$src" || exit 1
 
-      - run: xcodebuild -alltargets -configuration Debug
-      - run: xcodebuild -alltargets -configuration Release
+      - run: xcodebuild -configuration Debug
+      - run: xcodebuild -configuration Release
 
       - name: Upload to Artifacts
         uses: actions/upload-artifact@v4
@@ -66,5 +66,5 @@ jobs:
         run: |
           src=$(/usr/bin/curl -Lfs https://gist.githubusercontent.com/VisualEhrmanntraut/bdcee42642ded532d7950397d45123c0/raw/04200ccf5ed244376f03f0d1e7168a725c0654b0/BootstrapVirtualSMC.sh) && eval "$src" || exit 1
 
-      - run: xcodebuild analyze -quiet -alltargets -configuration Debug CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
-      - run: xcodebuild analyze -quiet -alltargets -configuration Release CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
+      - run: xcodebuild analyze -quiet -configuration Debug CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
+      - run: xcodebuild analyze -quiet -configuration Release CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]

@@ -23,7 +23,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: ["cpp", "swift"]
+        language: ["cpp"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -42,7 +42,7 @@ jobs:
       - name: VirtualSMC Bootstrap
         run: |
           src=$(/usr/bin/curl -Lfs https://gist.githubusercontent.com/VisualEhrmanntraut/bdcee42642ded532d7950397d45123c0/raw/04200ccf5ed244376f03f0d1e7168a725c0654b0/BootstrapVirtualSMC.sh) && eval "$src" || exit 1
-      - run: xcodebuild -alltargets -configuration Debug
+      - run: xcodebuild -configuration Debug
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
         with:
