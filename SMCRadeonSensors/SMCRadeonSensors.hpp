@@ -2,12 +2,13 @@
 //  details.
 
 #pragma once
-#include <RadeonSensor.hpp>
+#include <Headers/kern_iokit.hpp>
+#include <IOKit/IOService.h>
 #include <VirtualSMCSDK/kern_vsmcapi.hpp>
 #include <VirtualSMCSDK/AppleSmc.h>
 
-class EXPORT SMCRadeonGPU : public IOService {
-    OSDeclareDefaultStructors(SMCRadeonGPU);
+class EXPORT PRODUCT_NAME : public IOService {
+    OSDeclareDefaultStructors(PRODUCT_NAME);
 
     static constexpr size_t MaxIndexCount = sizeof("0123456789ABCDEF") - 1;
     static constexpr const char *KeyIndexes = "0123456789ABCDEF";
@@ -24,14 +25,17 @@ class EXPORT SMCRadeonGPU : public IOService {
         VirtualSMCAPI::Version,
     };
 
-    RadeonSensor *rsensor {nullptr};
+    OSArray *cards {nullptr};
     IONotifier *vsmcNotifier {nullptr};
 
     public:
-    IOService *probe(IOService *provider, SInt32 *score) override;
+    IOService *probe(IOService *provider, SInt32 *score) APPLE_KEXT_OVERRIDE;
+    bool start(IOService *provider) APPLE_KEXT_OVERRIDE;
+    void free() APPLE_KEXT_OVERRIDE;
+    void stop(IOService *provider) APPLE_KEXT_OVERRIDE;
 
-    bool start(IOService *provider) override;
-    void stop(IOService *provider) override;
+    virtual UInt16 getTemperature(UInt16 card);
+    virtual UInt16 getCardCount();
 
     static bool vsmcNotificationHandler(void *target, void *refCon, IOService *newService, IONotifier *notifier);
 };

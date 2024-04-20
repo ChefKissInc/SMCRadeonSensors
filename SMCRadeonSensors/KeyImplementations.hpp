@@ -2,16 +2,16 @@
 //  details.
 
 #pragma once
-#include "SMCRadeonGPU.hpp"
+#include "SMCRadeonSensors.hpp"
 #include <VirtualSMCSDK/AppleSmc.h>
 
 class RadeonSMCValue : public VirtualSMCValue {
     protected:
     size_t index {0};
-    RadeonSensor *provider {nullptr};
+    PRODUCT_NAME *provider {nullptr};
 
     public:
-    RadeonSMCValue(RadeonSensor *provider, size_t index) : index {index}, provider {provider} {}
+    RadeonSMCValue(PRODUCT_NAME *provider, size_t index) : index {index}, provider {provider} {}
 };
 
 class RGPUTempValue : public RadeonSMCValue {

@@ -1,7 +1,8 @@
 //  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
 //  details.
 
-#include "RadeonSensor.hpp"
+#include "SMCRadeonSensors.hpp"
+#include "KeyImplementations.hpp"
 #include "RSensorCard.hpp"
 #include <Headers/kern_api.hpp>
 #include <Headers/kern_devinfo.hpp>
@@ -60,6 +61,24 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
 
     DBGLOG("RSensor", "Found %lu cards", this->cards->getCount());
 
+    for (auto i = 0; i < this->cards->getCount(); i++) {
+        VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+        VirtualSMCAPI::addKey(KeyTGxP(i), vsmcPlugin.data,
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+        VirtualSMCAPI::addKey(KeyTGxd(i), vsmcPlugin.data,
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+        VirtualSMCAPI::addKey(KeyTGxp(i), vsmcPlugin.data,
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+        if (i == 0) {
+            VirtualSMCAPI::addKey(KeyTGDD, vsmcPlugin.data,
+                VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+        }
+    }
+
+    qsort(const_cast<VirtualSMCKeyValue *>(vsmcPlugin.data.data()), vsmcPlugin.data.size(), sizeof(VirtualSMCKeyValue),
+        VirtualSMCKeyValue::compare);
+
     return this;
 }
 
@@ -71,10 +90,38 @@ bool PRODUCT_NAME::start(IOService *provider) {
 
     SYSLOG("RSensor", "Copyright 2023 ChefKiss Inc. If you've paid for this, you've been scammed.");
 
-    this->registerService();
+    this->setProperty("VersionInfo", kextVersion);
+
+    this->vsmcNotifier = VirtualSMCAPI::registerHandler(vsmcNotificationHandler, this);
+    if (!this->vsmcNotifier) {
+        SYSLOG("init", "VirtualSMCAPI::registerHandler failed");
+        return false;
+    }
 
     return true;
 }
+
+bool PRODUCT_NAME::vsmcNotificationHandler(void *target, void *, IOService *newService, IONotifier *) {
+    if (!target || !newService) {
+        SYSLOG("RSensor", "Null notification");
+        return false;
+    }
+
+    auto &plugin = static_cast<PRODUCT_NAME *>(target)->vsmcPlugin;
+    auto ret = newService->callPlatformFunction(VirtualSMCAPI::SubmitPlugin, true, target, &plugin, nullptr, nullptr);
+    if (ret == kIOReturnSuccess) {
+        DBGLOG("RSensor", "Submitted plugin");
+        return true;
+    }
+    if (ret != kIOReturnUnsupported) {
+        SYSLOG("RSensor", "Plugin submission failure: 0x%X", ret);
+        return false;
+    }
+    SYSLOG("RSensor", "Plugin submitted to non-VSMC");
+    return false;
+}
+
+void PRODUCT_NAME::stop(IOService *) { PANIC("RSensor", "Called stop!!!"); }
 
 void PRODUCT_NAME::free() {
     OSSafeReleaseNULL(this->cards);

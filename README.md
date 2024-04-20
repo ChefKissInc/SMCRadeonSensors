@@ -1,24 +1,16 @@
-# RadeonSensor ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/NootInc/RadeonSensor/main.yml?branch=master&logo=github&style=for-the-badge) [![Release Badge](https://img.shields.io/github/release/NootInc/RadeonSensor?include_prereleases&style=for-the-badge&sort=semver&color=blue)](https://github.com/NootInc/RadeonSensor/releases) [![Downloads Badge](https://img.shields.io/github/downloads/NootInc/RadeonSensor/total.svg?style=for-the-badge)](https://github.com/NootInc/RadeonSensor/releases/latest "Download status")
+# SMCRadeonSensors ![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/ChefKissInc/SMCRadeonSensors/main.yml?branch=master&logo=github&style=for-the-badge) [![Release Badge](https://img.shields.io/github/release/ChefKissInc/RadeonSensor?include_prereleases&style=for-the-badge&sort=semver&color=blue)](https://github.com/ChefKissInc/SMCRadeonSensors/releases) [![Downloads Badge](https://img.shields.io/github/downloads/ChefKissInc/RadeonSensor/total.svg?style=for-the-badge)](https://github.com/ChefKissInc/SMCRadeonSensors/releases/latest)
 
-macOS Kext and Gadget that display the temperature of AMD GPUs in the system.
+A [VirtualSMC](https://github.com/Acidanthera/VirtualSMC) plug-in that provides temperature readings for AMD GPUs.
 
 Supports AMD dGPUs starting with the `Radeon HD 7000` series up to the `RX 6000 series` and all `Vega` (GCN 5/Raven ASIC) iGPUs.
 
-Requires `macOS 10.15` and newer.
+Requires `macOS 10.14` or newer, [Lilu](https://github.com/Acidanthera/Lilu) and [VirtualSMC](https://github.com/Acidanthera/VirtualSMC).
 
 The Source Code of this Original Work is licensed under the `Thou Shalt Not Profit License version 1.0`. See [`LICENSE`](https://github.com/NootInc/NootedRed/blob/master/LICENSE).
-
-![Status Bar Screenshot](Assets/StatusBar.png)
 
 ## AMD GPU temperature and macOS
 
 Apple stopped reporting the temperature since the `Radeon VII`. `Vega 10` and older can still report the temperature using external tools.
-
-## Components
-
-* `RadeonSensor.kext`: Main sensor component. Requires `Lilu`.
-* `SMCRadeonGPU.kext`: Exports sensor values to VirtualSMC for monitoring tools that utilise the SMC.
-* `RadeonGadget.app`: Displays GPU temperature in the status bar. Requires `RadeonSensor`.
 
 ### Credits
 

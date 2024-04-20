@@ -23,7 +23,7 @@ class RSensorCard : public OSObject {
     IOPCIDevice *dev {nullptr};
     volatile UInt32 *rmmioPtr {nullptr};
     IOMemoryMap *rmmio {nullptr};
-    bool thm11 = false;
+    bool thm11 {false};
 
     UInt32 readIndirectSMCSI(UInt32 reg);
     UInt32 readIndirectSMCVI(UInt32 reg);
