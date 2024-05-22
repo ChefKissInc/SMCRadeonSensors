@@ -14,6 +14,8 @@ jobs:
   build:
     name: Build
     runs-on: macos-latest
+    permissions:
+      contents: write
     env:
       JOB_TYPE: BUILD
     steps:
@@ -26,8 +28,8 @@ jobs:
         run: src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/Lilu/master/Lilu/Scripts/bootstrap.sh) && eval "$src" || exit 1
       - name: VirtualSMC Bootstrap
         run: src=$(/usr/bin/curl -Lfs https://gist.githubusercontent.com/VisualEhrmanntraut/bdcee42642ded532d7950397d45123c0/raw/04200ccf5ed244376f03f0d1e7168a725c0654b0/BootstrapVirtualSMC.sh) && eval "$src" || exit 1
-      - run: xcodebuild -configuration Debug
-      - run: xcodebuild -configuration Release
+      - run: xcodebuild -configuration Debug -arch x86_64 build
+      - run: xcodebuild -configuration Release -arch x86_64 build
       - name: Upload build
         uses: svenstaro/upload-release-action@2.9.0
         if: github.event_name != 'pull_request'
@@ -35,6 +37,7 @@ jobs:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: build/*/*.zip
           tag: ${{ github.event_name == 'release' && github.ref || 'nightly' }}
+          body: ${{ github.event_name != 'release' && github.event.head_commit.message || '' }}
           file_glob: true
           prerelease: ${{ github.event_name != 'release' }}
           overwrite: true
@@ -54,5 +57,5 @@ jobs:
         run: src=$(/usr/bin/curl -Lfs https://raw.githubusercontent.com/acidanthera/Lilu/master/Lilu/Scripts/bootstrap.sh) && eval "$src" || exit 1
       - name: VirtualSMC Bootstrap
         run: src=$(/usr/bin/curl -Lfs https://gist.githubusercontent.com/VisualEhrmanntraut/bdcee42642ded532d7950397d45123c0/raw/04200ccf5ed244376f03f0d1e7168a725c0654b0/BootstrapVirtualSMC.sh) && eval "$src" || exit 1
-      - run: xcodebuild analyze -quiet -configuration Debug CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
-      - run: xcodebuild analyze -quiet -configuration Release CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
+      - run: xcodebuild analyze -quiet -configuration Debug -arch x86_64 CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
+      - run: xcodebuild analyze -quiet -configuration Release -arch x86_64 CLANG_ANALYZER_OUTPUT=plist-html CLANG_ANALYZER_OUTPUT_DIR="$(pwd)/clang-analyze" && [ "$(find clang-analyze -name "*.html")" = "" ]
