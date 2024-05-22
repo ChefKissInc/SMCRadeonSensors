@@ -1,5 +1,19 @@
 # Change log
 
+## 2.0.0 (20/04/2024)
+
+### Enhancements
+
+- RadeonGadget has been removed; the project is now a single VirtualSMC plug-in.
+
+  Don't forget to remove the old SMCRadeonGPU/RadeonSensor combination before putting this in.
+
+  The philosophy behind this is to have as close to native experience as possible.
+
+  Recommended apps for viewing sensors on the system: XS-Labs' Hot, exelban's Stats, iStat Menus (paid), etc.
+
+  Not affiliated with any of these people, just mentioning them for your convenience.
+
 ## 1.3.0 (15/09/2023)
 
 ### Bug fixes
