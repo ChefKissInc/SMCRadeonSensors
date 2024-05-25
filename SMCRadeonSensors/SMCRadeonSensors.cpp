@@ -1,4 +1,4 @@
-//  Copyright © 2023 ChefKiss Inc. Licensed under the Thou Shalt Not Profit License version 1.0. See LICENSE for
+//  Copyright © 2023-2024 ChefKiss. Licensed under the Thou Shalt Not Profit License version 1.5. See LICENSE for
 //  details.
 
 #include "SMCRadeonSensors.hpp"
@@ -88,7 +88,7 @@ bool PRODUCT_NAME::start(IOService *provider) {
         return false;
     }
 
-    SYSLOG("RSensor", "Copyright 2023 ChefKiss Inc. If you've paid for this, you've been scammed.");
+    SYSLOG("RSensor", "Copyright 2023-2024 ChefKiss. If you've paid for this, you've been scammed.");
 
     this->setProperty("VersionInfo", kextVersion);
 

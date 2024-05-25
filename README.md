@@ -6,7 +6,7 @@ Supports AMD dGPUs starting with the `Radeon HD 7000` series up to the `RX 6000 
 
 Requires `macOS 10.14` or newer, [Lilu](https://github.com/Acidanthera/Lilu) and [VirtualSMC](https://github.com/Acidanthera/VirtualSMC).
 
-The Source Code of this Original Work is licensed under the `Thou Shalt Not Profit License version 1.0`. See [`LICENSE`](https://github.com/NootInc/NootedRed/blob/master/LICENSE).
+The SMCRadeonSensors project is licensed under the `Thou Shalt Not Profit License version 1.5`. See [`LICENSE`](https://github.com/ChefKissInc/SMCRadeonSensors/blob/master/LICENSE).
 
 ## AMD GPU temperature and macOS
 
@@ -14,8 +14,8 @@ Apple stopped reporting the temperature since the `Radeon VII`. `Vega 10` and ol
 
 ### Credits
 
-* [Linux](https://github.com/torvalds/linux) for the temperature logic in the `amdgpu` driver
-* [Acidanthera](https://github.com/Acidanthera) for `Lilu` and `VirtualSMC`
-* [AMD](https://amd.com) for their GPUs.
-* [Aluveitie](https://github.com/Aluveitie) for the previous work.
-* [FakeSMC3](https://github.com/CloverHackyColor/FakeSMC3_with_plugins) for the original code, adapted by Aluveitie for `VirtualSMC`, now rewritten by us.
+- [Linux](https://github.com/torvalds/linux) for the temperature logic in the `amdgpu` driver
+- [Acidanthera](https://github.com/Acidanthera) for `Lilu` and `VirtualSMC`
+- [AMD](https://amd.com) for their GPUs.
+- [Aluveitie](https://github.com/Aluveitie) for the previous work.
+- [FakeSMC3](https://github.com/CloverHackyColor/FakeSMC3_with_plugins) for the original code, adapted by Aluveitie for `VirtualSMC`, now rewritten by us.
