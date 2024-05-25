@@ -3,7 +3,7 @@
 
 #include "SMCRadeonSensors.hpp"
 #include "KeyImplementations.hpp"
-#include "RSensorCard.hpp"
+#include "SMCRSCard.hpp"
 #include <Headers/kern_api.hpp>
 #include <Headers/kern_devinfo.hpp>
 #include <Headers/kern_iokit.hpp>
@@ -21,18 +21,18 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
 
     auto *dict = IOService::serviceMatching("IOPCIDevice");
     if (!dict) {
-        SYSLOG("RSensor", "Failed to create matching dict for IOPCIDevice");
+        SYSLOG("SMCRS", "Failed to create matching dict for IOPCIDevice");
         return nullptr;
     }
     auto *iter = IOService::getMatchingServices(dict);
     dict->release();
     if (!iter) {
-        SYSLOG("RSensor", "Failed to get iterator over IOPCIDevice");
+        SYSLOG("SMCRS", "Failed to get iterator over IOPCIDevice");
         return nullptr;
     }
     this->cards = OSArray::withCapacity(0);
     if (!this->cards) {
-        SYSLOG("RSensor", "Failed to allocate cards array");
+        SYSLOG("SMCRS", "Failed to allocate cards array");
         iter->release();
         return nullptr;
     }
@@ -47,7 +47,7 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
                 classCode != WIOKit::ClassCode::Ex3DController && classCode != WIOKit::ClassCode::XGAController)) {
             continue;
         }
-        auto *card = new RSensorCard {};
+        auto *card = new SMCRSCard {};
         if (!card) { continue; }
         if (card->initialise(device)) { this->cards->setObject(card); }
         card->release();
@@ -59,7 +59,7 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
         return nullptr;
     }
 
-    DBGLOG("RSensor", "Found %lu cards", this->cards->getCount());
+    DBGLOG("SMCRS", "Found %lu cards", this->cards->getCount());
 
     for (auto i = 0; i < this->cards->getCount(); i++) {
         VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
@@ -84,11 +84,11 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
 
 bool PRODUCT_NAME::start(IOService *provider) {
     if (!IOService::start(provider)) {
-        SYSLOG("RSensor", "Failed to start the parent");
+        SYSLOG("SMCRS", "Failed to start the parent");
         return false;
     }
 
-    SYSLOG("RSensor", "Copyright 2023-2024 ChefKiss. If you've paid for this, you've been scammed.");
+    SYSLOG("SMCRS", "Copyright 2023-2024 ChefKiss. If you've paid for this, you've been scammed.");
 
     this->setProperty("VersionInfo", kextVersion);
 
@@ -103,25 +103,25 @@ bool PRODUCT_NAME::start(IOService *provider) {
 
 bool PRODUCT_NAME::vsmcNotificationHandler(void *target, void *, IOService *newService, IONotifier *) {
     if (!target || !newService) {
-        SYSLOG("RSensor", "Null notification");
+        SYSLOG("SMCRS", "Null notification");
         return false;
     }
 
     auto &plugin = static_cast<PRODUCT_NAME *>(target)->vsmcPlugin;
     auto ret = newService->callPlatformFunction(VirtualSMCAPI::SubmitPlugin, true, target, &plugin, nullptr, nullptr);
     if (ret == kIOReturnSuccess) {
-        DBGLOG("RSensor", "Submitted plugin");
+        DBGLOG("SMCRS", "Submitted plugin");
         return true;
     }
     if (ret != kIOReturnUnsupported) {
-        SYSLOG("RSensor", "Plugin submission failure: 0x%X", ret);
+        SYSLOG("SMCRS", "Plugin submission failure: 0x%X", ret);
         return false;
     }
-    SYSLOG("RSensor", "Plugin submitted to non-VSMC");
+    SYSLOG("SMCRS", "Plugin submitted to non-VSMC");
     return false;
 }
 
-void PRODUCT_NAME::stop(IOService *) { PANIC("RSensor", "Called stop!!!"); }
+void PRODUCT_NAME::stop(IOService *) { PANIC("SMCRS", "Called stop!!!"); }
 
 void PRODUCT_NAME::free() {
     OSSafeReleaseNULL(this->cards);
@@ -131,7 +131,7 @@ void PRODUCT_NAME::free() {
 UInt16 PRODUCT_NAME::getTemperature(UInt16 card) {
     if (!this->cards || card >= this->cards->getCount()) { return 0xFF; }
 
-    auto *obj = OSDynamicCast(RSensorCard, this->cards->getObject(card));
+    auto *obj = OSDynamicCast(SMCRSCard, this->cards->getObject(card));
     if (!obj) { return 0xFF; }
     UInt16 temp = 0;
     if (obj->getTemperature(&temp) != kIOReturnSuccess) { return 0xFF; }

@@ -15,8 +15,8 @@ enum struct ChipFamily {
     Navi,
 };
 
-class RSensorCard : public OSObject {
-    OSDeclareDefaultStructors(RSensorCard);
+class SMCRSCard : public OSObject {
+    OSDeclareDefaultStructors(SMCRSCard);
 
     ChipFamily chipFamily {ChipFamily::Unknown};
 
