@@ -7,6 +7,88 @@
 
 OSDefineMetaClassAndStructors(SMCRSCard, OSObject);
 
+IOReturn SMCRSCard::ensureRMMIOMapped() {
+    if (this->rmmio == nullptr) {
+        auto bar5 = this->chipFamily >= ChipFamily::SouthernIslands;
+        this->rmmio =
+            this->dev->mapDeviceMemoryWithRegister(bar5 ? kIOPCIConfigBaseAddress5 : kIOPCIConfigBaseAddress2);
+        if (!this->rmmio || !this->rmmio->getLength()) {
+            SYSLOG("RSCard", "Failed to map BAR%d", bar5 ? 5 : 2);
+            OSSafeReleaseNULL(this->rmmio);
+            return kIOReturnDeviceError;
+        }
+        this->rmmioPtr = reinterpret_cast<volatile UInt32 *>(this->rmmio->getVirtualAddress());
+        if (!this->rmmioPtr) {
+            SYSLOG("RSCard", "Failed to get virtual address for BAR%d", bar5 ? 5 : 2);
+            OSSafeReleaseNULL(this->rmmio);
+            return kIOReturnDeviceError;
+        }
+        DBGLOG("RSCard", "Using BAR%d, located at %p", bar5 ? 5 : 2, this->rmmioPtr);
+    }
+
+    return kIOReturnSuccess;
+}
+
+UInt32 SMCRSCard::readReg32(UInt32 reg) {
+    if (this->ensureRMMIOMapped() != kIOReturnSuccess) { return 0xFFFFFFFF; }
+
+    bool soc15 = this->chipFamily >= ChipFamily::ArcticIslands;
+    if ((reg * 4) < this->rmmio->getLength()) {
+        return this->rmmioPtr[reg];
+    } else {
+        this->rmmioPtr[soc15 ? mmPCIE_INDEX2 : mmPCIE_INDEX] = reg;
+        return this->rmmioPtr[soc15 ? mmPCIE_DATA2 : mmPCIE_DATA];
+    }
+}
+
+void SMCRSCard::writeReg32(UInt32 reg, UInt32 val) {
+    if (this->ensureRMMIOMapped() != kIOReturnSuccess) { return; }
+
+    bool soc15 = this->chipFamily >= ChipFamily::ArcticIslands;
+    if ((reg * 4) < this->rmmio->getLength()) {
+        this->rmmioPtr[reg] = val;
+    } else {
+        this->rmmioPtr[soc15 ? mmPCIE_INDEX2 : mmPCIE_INDEX] = reg;
+        this->rmmioPtr[soc15 ? mmPCIE_DATA2 : mmPCIE_DATA] = val;
+    }
+}
+
+UInt32 SMCRSCard::readIndirectSMCSI(UInt32 reg) {
+    this->writeReg32(mmSMC_IND_INDEX_0, reg);
+    return this->readReg32(mmSMC_IND_DATA_0);
+}
+
+UInt32 SMCRSCard::readIndirectSMCVI(UInt32 reg) {
+    this->writeReg32(mmSMC_IND_INDEX_11, reg);
+    return this->readReg32(mmSMC_IND_DATA_11);
+}
+
+IOReturn SMCRSCard::getTempSI(UInt16 *data) {
+    auto ctfTemp = GET_THERMAL_STATUS_CTF_TEMP(this->readIndirectSMCSI(ixCG_MULT_THERMAL_STATUS));
+    *data = (ctfTemp & 0x200) ? 255 : (ctfTemp & 0x1FF);
+    return kIOReturnSuccess;
+}
+
+IOReturn SMCRSCard::getTempVI(UInt16 *data) {
+    auto ctfTemp = GET_THERMAL_STATUS_CTF_TEMP(this->readIndirectSMCVI(ixCG_MULT_THERMAL_STATUS));
+    *data = (ctfTemp & 0x200) ? 255 : (ctfTemp & 0x1FF);
+    return kIOReturnSuccess;
+}
+
+IOReturn SMCRSCard::getTempAI(UInt16 *data) {
+    auto reg =
+        this->readReg32(THM_BASE + (this->thm11 ? mmCG_MULT_THERMAL_STATUS_THM11 : mmCG_MULT_THERMAL_STATUS_THM9));
+    *data = GET_THERMAL_STATUS_CTF_TEMP(reg) & 0x1FF;
+    return kIOReturnSuccess;
+}
+
+IOReturn SMCRSCard::getTempRV(UInt16 *data) {
+    auto reg = this->readReg32(THM_BASE + mmTHM_TCON_CUR_TMP);
+    *data = GET_TCON_CUR_TEMP(reg) / 8;
+    if (reg & CUR_TEMP_RANGE_SEL) { *data -= 49; }
+    return kIOReturnSuccess;
+}
+
 bool SMCRSCard::initialise(IOPCIDevice *device) {
     if (!device) { return false; }
     this->dev = device;
@@ -65,21 +147,6 @@ bool SMCRSCard::initialise(IOPCIDevice *device) {
             return false;
     }
 
-    auto bar5 = this->chipFamily >= ChipFamily::SouthernIslands;
-    this->rmmio = this->dev->mapDeviceMemoryWithRegister(bar5 ? kIOPCIConfigBaseAddress5 : kIOPCIConfigBaseAddress2);
-    if (!this->rmmio || !this->rmmio->getLength()) {
-        SYSLOG("RSCard", "Failed to map BAR%d", bar5 ? 5 : 2);
-        OSSafeReleaseNULL(this->rmmio);
-        return false;
-    }
-    this->rmmioPtr = reinterpret_cast<volatile UInt32 *>(this->rmmio->getVirtualAddress());
-    if (!this->rmmioPtr) {
-        SYSLOG("RSCard", "Failed to get virtual address for BAR%d", bar5 ? 5 : 2);
-        OSSafeReleaseNULL(this->rmmio);
-        return false;
-    }
-    DBGLOG("RSCard", "Using BAR%d, located at %p", bar5 ? 5 : 2, this->rmmioPtr);
-
     return true;
 }
 
@@ -100,60 +167,4 @@ IOReturn SMCRSCard::getTemperature(UInt16 *data) {
         default:
             return kIOReturnError;
     }
-}
-
-UInt32 SMCRSCard::readIndirectSMCSI(UInt32 reg) {
-    this->writeReg32(mmSMC_IND_INDEX_0, reg);
-    return this->readReg32(mmSMC_IND_DATA_0);
-}
-
-UInt32 SMCRSCard::readIndirectSMCVI(UInt32 reg) {
-    this->writeReg32(mmSMC_IND_INDEX_11, reg);
-    return this->readReg32(mmSMC_IND_DATA_11);
-}
-
-UInt32 SMCRSCard::readReg32(UInt32 reg) {
-    bool soc15 = this->chipFamily >= ChipFamily::ArcticIslands;
-    if ((reg * 4) < this->rmmio->getLength()) {
-        return this->rmmioPtr[reg];
-    } else {
-        this->rmmioPtr[soc15 ? mmPCIE_INDEX2 : mmPCIE_INDEX] = reg;
-        return this->rmmioPtr[soc15 ? mmPCIE_DATA2 : mmPCIE_DATA];
-    }
-}
-
-void SMCRSCard::writeReg32(UInt32 reg, UInt32 val) {
-    bool soc15 = this->chipFamily >= ChipFamily::ArcticIslands;
-    if ((reg * 4) < this->rmmio->getLength()) {
-        this->rmmioPtr[reg] = val;
-    } else {
-        this->rmmioPtr[soc15 ? mmPCIE_INDEX2 : mmPCIE_INDEX] = reg;
-        this->rmmioPtr[soc15 ? mmPCIE_DATA2 : mmPCIE_DATA] = val;
-    }
-}
-
-IOReturn SMCRSCard::getTempSI(UInt16 *data) {
-    auto ctfTemp = GET_THERMAL_STATUS_CTF_TEMP(this->readIndirectSMCSI(ixCG_MULT_THERMAL_STATUS));
-    *data = (ctfTemp & 0x200) ? 255 : (ctfTemp & 0x1FF);
-    return kIOReturnSuccess;
-}
-
-IOReturn SMCRSCard::getTempVI(UInt16 *data) {
-    auto ctfTemp = GET_THERMAL_STATUS_CTF_TEMP(this->readIndirectSMCVI(ixCG_MULT_THERMAL_STATUS));
-    *data = (ctfTemp & 0x200) ? 255 : (ctfTemp & 0x1FF);
-    return kIOReturnSuccess;
-}
-
-IOReturn SMCRSCard::getTempAI(UInt16 *data) {
-    auto reg =
-        this->readReg32(THM_BASE + (this->thm11 ? mmCG_MULT_THERMAL_STATUS_THM11 : mmCG_MULT_THERMAL_STATUS_THM9));
-    *data = GET_THERMAL_STATUS_CTF_TEMP(reg) & 0x1FF;
-    return kIOReturnSuccess;
-}
-
-IOReturn SMCRSCard::getTempRV(UInt16 *data) {
-    auto reg = this->readReg32(THM_BASE + mmTHM_TCON_CUR_TMP);
-    *data = GET_TCON_CUR_TEMP(reg) / 8;
-    if (reg & CUR_TEMP_RANGE_SEL) { *data -= 49; }
-    return kIOReturnSuccess;
 }

@@ -25,10 +25,11 @@ class SMCRSCard : public OSObject {
     IOMemoryMap *rmmio {nullptr};
     bool thm11 {false};
 
-    UInt32 readIndirectSMCSI(UInt32 reg);
-    UInt32 readIndirectSMCVI(UInt32 reg);
+    IOReturn ensureRMMIOMapped();
     UInt32 readReg32(UInt32 reg);
     void writeReg32(UInt32 reg, UInt32 val);
+    UInt32 readIndirectSMCSI(UInt32 reg);
+    UInt32 readIndirectSMCVI(UInt32 reg);
 
     IOReturn getTempSI(UInt16 *data);
     IOReturn getTempVI(UInt16 *data);
