@@ -1,5 +1,11 @@
 # Change log
 
+## 2.1.0 (25/05/2024)
+
+## Bug fixes
+
+- Incorrect temperature readings were reported on Polaris and older cards.
+
 ## 2.0.0 (20/04/2024)
 
 ### Enhancements
