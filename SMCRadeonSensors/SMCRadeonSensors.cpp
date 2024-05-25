@@ -59,9 +59,9 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
         return nullptr;
     }
 
-    DBGLOG("SMCRS", "Found %lu cards", this->cards->getCount());
+    DBGLOG("SMCRS", "Found %u cards", this->cards->getCount());
 
-    for (auto i = 0; i < this->cards->getCount(); i++) {
+    for (UInt32 i = 0; i < this->cards->getCount(); i++) {
         VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
         VirtualSMCAPI::addKey(KeyTGxP(i), vsmcPlugin.data,
