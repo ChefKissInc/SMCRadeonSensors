@@ -133,27 +133,27 @@ void RSensorCard::writeReg32(UInt32 reg, UInt32 val) {
 }
 
 IOReturn RSensorCard::getTempSI(UInt16 *data) {
-    auto regValue = this->readIndirectSMCSI(ixCG_MULT_THERMAL_STATUS);
-    *data = (regValue & 0x200) ? 255 : (regValue & 0x1FF);
+    auto ctfTemp = GET_THERMAL_STATUS_CTF_TEMP(this->readIndirectSMCSI(ixCG_MULT_THERMAL_STATUS));
+    *data = (ctfTemp & 0x200) ? 255 : (ctfTemp & 0x1FF);
     return kIOReturnSuccess;
 }
 
 IOReturn RSensorCard::getTempVI(UInt16 *data) {
-    auto regValue = this->readIndirectSMCVI(ixCG_MULT_THERMAL_STATUS);
-    *data = (regValue & 0x200) ? 255 : (regValue & 0x1FF);
+    auto ctfTemp = GET_THERMAL_STATUS_CTF_TEMP(this->readIndirectSMCVI(ixCG_MULT_THERMAL_STATUS));
+    *data = (ctfTemp & 0x200) ? 255 : (ctfTemp & 0x1FF);
     return kIOReturnSuccess;
 }
 
 IOReturn RSensorCard::getTempAI(UInt16 *data) {
-    auto regValue =
+    auto reg =
         this->readReg32(THM_BASE + (this->thm11 ? mmCG_MULT_THERMAL_STATUS_THM11 : mmCG_MULT_THERMAL_STATUS_THM9));
-    *data = ((regValue & CTF_TEMP_MASK) >> CTF_TEMP_SHIFT) & 0x1FF;
+    *data = GET_THERMAL_STATUS_CTF_TEMP(reg) & 0x1FF;
     return kIOReturnSuccess;
 }
 
 IOReturn RSensorCard::getTempRV(UInt16 *data) {
-    auto regValue = this->readReg32(THM_BASE + mmTHM_TCON_CUR_TMP);
-    *data = ((regValue & CUR_TEMP_MASK) >> CUR_TEMP_SHIFT) / 8;
-    if (regValue & CUR_TEMP_RANGE_SEL_MASK) { *data -= 49; }
+    auto reg = this->readReg32(THM_BASE + mmTHM_TCON_CUR_TMP);
+    *data = GET_TCON_CUR_TEMP(reg) / 8;
+    if (reg & CUR_TEMP_RANGE_SEL) { *data -= 49; }
     return kIOReturnSuccess;
 }
