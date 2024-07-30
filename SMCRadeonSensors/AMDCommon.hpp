@@ -20,8 +20,8 @@ constexpr UInt32 THM_BASE = 0x16600;
 
 constexpr UInt32 mmTHM_TCON_CUR_TMP = 0;
 constexpr UInt32 CUR_TEMP_RANGE_SEL = 0x80000;
-#define GET_TCON_CUR_TEMP(v) (((v)&0xFFE00000) >> 21)
+#define GET_TCON_CUR_TEMP(v) (((v) & 0xFFE00000) >> 21)
 
 constexpr UInt32 mmCG_MULT_THERMAL_STATUS_THM9 = 0x5A;
 constexpr UInt32 mmCG_MULT_THERMAL_STATUS_THM11 = 0x5F;
-#define GET_THERMAL_STATUS_CTF_TEMP(v) (((v)&0x3FE00) >> 9)
+#define GET_THERMAL_STATUS_CTF_TEMP(v) (((v) & 0x3FE00) >> 9)
