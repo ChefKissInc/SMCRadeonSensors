@@ -22,7 +22,7 @@
 	<string>$(MODULE_VERSION)</string>
 	<key>IOKitPersonalities</key>
 	<dict>
-		<key>com.ChefKiss.SMCRadeonSensors</key>
+		<key>org.ChefKiss.SMCRadeonSensors</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>

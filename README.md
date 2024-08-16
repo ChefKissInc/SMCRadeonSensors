@@ -2,15 +2,11 @@
 
 A [VirtualSMC](https://github.com/Acidanthera/VirtualSMC) plug-in that provides temperature readings for AMD GPUs.
 
+The SMCRadeonSensors project is Copyright © 2023-2024 ChefKiss. The SMCRadeonSensors project is licensed under the `Thou Shalt Not Profit License version 1.5`. See [`LICENSE`](https://github.com/ChefKissInc/SMCRadeonSensors/blob/master/LICENSE).
+
 Supports AMD dGPUs starting with the `Radeon HD 7000` series up to the `RX 6000 series` and all `Vega` (GCN 5/Raven ASIC) iGPUs.
 
 Requires `macOS 10.14` or newer, [Lilu](https://github.com/Acidanthera/Lilu) and [VirtualSMC](https://github.com/Acidanthera/VirtualSMC).
-
-The SMCRadeonSensors project is licensed under the `Thou Shalt Not Profit License version 1.5`. See [`LICENSE`](https://github.com/ChefKissInc/SMCRadeonSensors/blob/master/LICENSE).
-
-## AMD GPU temperature and macOS
-
-Apple stopped reporting the temperature since the `Radeon VII`. `Vega 10` and older can still report the temperature using external tools.
 
 ### Credits
 
