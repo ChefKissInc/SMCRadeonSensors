@@ -1,3 +1,9 @@
 [submodule "MacKernelSDK"]
 	path = MacKernelSDK
 	url = https://github.com/Acidanthera/MacKernelSDK
+[submodule "Lilu"]
+	path = Lilu
+	url = https://github.com/acidanthera/Lilu
+[submodule "VirtualSMC"]
+	path = VirtualSMC
+	url = https://github.com/acidanthera/VirtualSMC

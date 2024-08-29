@@ -25,7 +25,7 @@
 		32F22C0227305D480017B007 /* AMDCommon.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AMDCommon.hpp; sourceTree = "<group>"; };
 		40167F4B2AAEFD91002ABD92 /* SMCRadeonSensors.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SMCRadeonSensors.hpp; sourceTree = "<group>"; };
 		4025801F2A13AE110060EA93 /* libkmod.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkmod.a; path = MacKernelSDK/Library/x86_64/libkmod.a; sourceTree = SOURCE_ROOT; };
-		403100822A161ADC0068FB05 /* plugin_start.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plugin_start.cpp; path = Lilu.kext/Contents/Resources/Library/plugin_start.cpp; sourceTree = "<group>"; };
+		403100822A161ADC0068FB05 /* plugin_start.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plugin_start.cpp; path = Lilu/Lilu/Library/plugin_start.cpp; sourceTree = "<group>"; };
 		CA1CAE4826FDE45B004D7E9A /* SMCRadeonSensors.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SMCRadeonSensors.cpp; sourceTree = "<group>"; };
 		CA1CAE5826FDF2FD004D7E9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CAED2D6D26FDC46500F319D5 /* SMCRadeonSensors.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SMCRadeonSensors.kext; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -274,8 +274,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"${PROJECT_DIR}/Lilu.kext/Contents/Resources",
-					"${PROJECT_DIR}/VirtualSMC.kext/Contents/Resources",
+					"${PROJECT_DIR}/Lilu/Lilu",
+					"${PROJECT_DIR}/VirtualSMC",
 					"$(PROJECT_DIR)/MacKernelSDK/Headers",
 				);
 				INFOPLIST_FILE = SMCRadeonSensors/Info.plist;
@@ -357,8 +357,8 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = (
-					"${PROJECT_DIR}/Lilu.kext/Contents/Resources",
-					"${PROJECT_DIR}/VirtualSMC.kext/Contents/Resources",
+					"${PROJECT_DIR}/Lilu/Lilu",
+					"${PROJECT_DIR}/VirtualSMC",
 					"$(PROJECT_DIR)/MacKernelSDK/Headers",
 				);
 				INFOPLIST_FILE = SMCRadeonSensors/Info.plist;
