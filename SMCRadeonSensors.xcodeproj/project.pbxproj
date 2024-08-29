@@ -24,7 +24,7 @@
 		329CCDA72710C64C00C662EE /* KeyImplementations.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = KeyImplementations.hpp; sourceTree = "<group>"; };
 		32F22C0227305D480017B007 /* AMDCommon.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = AMDCommon.hpp; sourceTree = "<group>"; };
 		40167F4B2AAEFD91002ABD92 /* SMCRadeonSensors.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = SMCRadeonSensors.hpp; sourceTree = "<group>"; };
-		4025801F2A13AE110060EA93 /* libkmod.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkmod.a; path = usr/lib/libkmod.a; sourceTree = SDKROOT; };
+		4025801F2A13AE110060EA93 /* libkmod.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libkmod.a; path = MacKernelSDK/Library/x86_64/libkmod.a; sourceTree = SOURCE_ROOT; };
 		403100822A161ADC0068FB05 /* plugin_start.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = plugin_start.cpp; path = Lilu.kext/Contents/Resources/Library/plugin_start.cpp; sourceTree = "<group>"; };
 		CA1CAE4826FDE45B004D7E9A /* SMCRadeonSensors.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SMCRadeonSensors.cpp; sourceTree = "<group>"; };
 		CA1CAE5826FDF2FD004D7E9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
