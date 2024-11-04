@@ -9,6 +9,8 @@ OSDefineMetaClassAndStructors(SMCRSCard, OSObject);
 
 IOReturn SMCRSCard::ensureRMMIOMapped() {
     if (this->rmmio == nullptr) {
+        this->dev->setMemoryEnable(true);
+        this->dev->setBusMasterEnable(true);
         auto bar5 = this->chipFamily >= ChipFamily::SouthernIslands;
         this->rmmio =
             this->dev->mapDeviceMemoryWithRegister(bar5 ? kIOPCIConfigBaseAddress5 : kIOPCIConfigBaseAddress2);
