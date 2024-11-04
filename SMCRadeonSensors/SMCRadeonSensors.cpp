@@ -129,13 +129,15 @@ void PRODUCT_NAME::free() {
     IOService::free();
 }
 
-UInt16 PRODUCT_NAME::getTemperature(UInt16 card) {
-    if (this->cards == nullptr || card >= this->cards->getCount()) { return 0xFF; }
+SMCRSCard *PRODUCT_NAME::getCard(UInt32 index) {
+    if (this->cards == nullptr || index >= this->cards->getCount()) { return nullptr; }
+    return OSDynamicCast(SMCRSCard, this->cards->getObject(index));
+}
 
-    auto *obj = OSDynamicCast(SMCRSCard, this->cards->getObject(card));
-    if (obj == nullptr) { return 0xFF; }
-    UInt16 temp = 0;
-    if (obj->getTemperature(&temp) != kIOReturnSuccess) { return 0xFF; }
+UInt16 PRODUCT_NAME::getTemperature(UInt32 index) {
+    UInt16 temp = 0xFF;
+    auto *obj = this->getCard(index);
+    if (obj != nullptr) { obj->getTemperature(&temp); }
     return temp;
 }
 
