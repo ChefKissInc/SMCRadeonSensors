@@ -95,6 +95,7 @@ bool PRODUCT_NAME::start(IOService *provider) {
     this->vsmcNotifier = VirtualSMCAPI::registerHandler(vsmcNotificationHandler, this);
     if (this->vsmcNotifier == nullptr) {
         SYSLOG("init", "VirtualSMCAPI::registerHandler failed");
+        IOService::stop(provider);
         return false;
     }
 
