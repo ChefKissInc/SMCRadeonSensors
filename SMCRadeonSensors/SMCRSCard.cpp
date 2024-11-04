@@ -14,13 +14,13 @@ IOReturn SMCRSCard::ensureRMMIOMapped() {
         auto bar5 = this->chipFamily >= ChipFamily::SouthernIslands;
         this->rmmio =
             this->dev->mapDeviceMemoryWithRegister(bar5 ? kIOPCIConfigBaseAddress5 : kIOPCIConfigBaseAddress2);
-        if (!this->rmmio || !this->rmmio->getLength()) {
+        if (this->rmmio == nullptr || !this->rmmio->getLength()) {
             SYSLOG("RSCard", "Failed to map BAR%d", bar5 ? 5 : 2);
             OSSafeReleaseNULL(this->rmmio);
             return kIOReturnDeviceError;
         }
         this->rmmioPtr = reinterpret_cast<volatile UInt32 *>(this->rmmio->getVirtualAddress());
-        if (!this->rmmioPtr) {
+        if (this->rmmioPtr == nullptr) {
             SYSLOG("RSCard", "Failed to get virtual address for BAR%d", bar5 ? 5 : 2);
             OSSafeReleaseNULL(this->rmmio);
             return kIOReturnDeviceError;
@@ -92,50 +92,40 @@ IOReturn SMCRSCard::getTempRV(UInt16 *data) {
 }
 
 bool SMCRSCard::initialise(IOPCIDevice *device) {
-    if (!device) { return false; }
+    if (device == nullptr) { return false; }
+
     this->dev = device;
 
     auto deviceID = WIOKit::readPCIConfigValue(this->dev, WIOKit::kIOPCIConfigDeviceID);
     switch (deviceID) {
         case 0x15DD:
-            [[fallthrough]];
         case 0x15D8:
-            [[fallthrough]];
         case 0x164C:
-            [[fallthrough]];
         case 0x1636:
-            [[fallthrough]];
         case 0x15E7:
-            [[fallthrough]];
         case 0x1638:
             this->chipFamily = ChipFamily::Raven;
             DBGLOG("RSCard", "Raven");
             break;
         case 0x66A0 ... 0x66AF:
             this->thm11 = true;
-            [[fallthrough]];
         case 0x6860 ... 0x687F:
-            [[fallthrough]];
         case 0x69A0 ... 0x69AF:
             this->chipFamily = ChipFamily::ArcticIslands;
             DBGLOG("RSCard", "Arctic Islands");
             break;
         case 0x67C0 ... 0x67FF:
-            [[fallthrough]];
         case 0x6980 ... 0x699F:
             this->chipFamily = ChipFamily::VolcanicIslands;
             DBGLOG("RSCard", "Volcanic Islands");
             break;
         case 0x6600 ... 0x666F:
-            [[fallthrough]];
         case 0x67A0 ... 0x67BF:
-            [[fallthrough]];
         case 0x6900 ... 0x693F:
             this->chipFamily = ChipFamily::SouthernIslands;
             DBGLOG("RSCard", "Southern Islands");
             break;
         case 0x6780 ... 0x679F:
-            [[fallthrough]];
         case 0x6800 ... 0x683F:
             this->chipFamily = ChipFamily::SeaIslands;
             DBGLOG("RSCard", "Sea Islands");
@@ -155,7 +145,6 @@ bool SMCRSCard::initialise(IOPCIDevice *device) {
 IOReturn SMCRSCard::getTemperature(UInt16 *data) {
     switch (this->chipFamily) {
         case ChipFamily::SeaIslands:
-            [[fallthrough]];
         case ChipFamily::SouthernIslands:
             return this->getTempSI(data);
         case ChipFamily::VolcanicIslands:
@@ -163,7 +152,6 @@ IOReturn SMCRSCard::getTemperature(UInt16 *data) {
         case ChipFamily::ArcticIslands:
             return this->getTempAI(data);
         case ChipFamily::Raven:
-            [[fallthrough]];
         case ChipFamily::Navi:
             return this->getTempRV(data);
         default:

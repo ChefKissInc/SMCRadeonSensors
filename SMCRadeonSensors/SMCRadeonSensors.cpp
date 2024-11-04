@@ -20,18 +20,18 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
     this->setProperty("VersionInfo", kextVersion);
 
     auto *dict = IOService::serviceMatching("IOPCIDevice");
-    if (!dict) {
+    if (dict == nullptr) {
         SYSLOG("SMCRS", "Failed to create matching dict for IOPCIDevice");
         return nullptr;
     }
     auto *iter = IOService::getMatchingServices(dict);
     dict->release();
-    if (!iter) {
+    if (iter == nullptr) {
         SYSLOG("SMCRS", "Failed to get iterator over IOPCIDevice");
         return nullptr;
     }
     this->cards = OSArray::withCapacity(0);
-    if (!this->cards) {
+    if (this->cards == nullptr) {
         SYSLOG("SMCRS", "Failed to allocate cards array");
         iter->release();
         return nullptr;
@@ -48,7 +48,7 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
             continue;
         }
         auto *card = new SMCRSCard {};
-        if (!card) { continue; }
+        if (card == nullptr) { continue; }
         if (card->initialise(device)) { this->cards->setObject(card); }
         card->release();
     }
