@@ -93,7 +93,7 @@ bool PRODUCT_NAME::start(IOService *provider) {
     this->setProperty("VersionInfo", kextVersion);
 
     this->vsmcNotifier = VirtualSMCAPI::registerHandler(vsmcNotificationHandler, this);
-    if (!this->vsmcNotifier) {
+    if (this->vsmcNotifier == nullptr) {
         SYSLOG("init", "VirtualSMCAPI::registerHandler failed");
         return false;
     }
@@ -102,7 +102,7 @@ bool PRODUCT_NAME::start(IOService *provider) {
 }
 
 bool PRODUCT_NAME::vsmcNotificationHandler(void *target, void *, IOService *newService, IONotifier *) {
-    if (!target || !newService) {
+    if (target == nullptr || newService == nullptr) {
         SYSLOG("SMCRS", "Null notification");
         return false;
     }
@@ -129,10 +129,10 @@ void PRODUCT_NAME::free() {
 }
 
 UInt16 PRODUCT_NAME::getTemperature(UInt16 card) {
-    if (!this->cards || card >= this->cards->getCount()) { return 0xFF; }
+    if (this->cards == nullptr || card >= this->cards->getCount()) { return 0xFF; }
 
     auto *obj = OSDynamicCast(SMCRSCard, this->cards->getObject(card));
-    if (!obj) { return 0xFF; }
+    if (obj == nullptr) { return 0xFF; }
     UInt16 temp = 0;
     if (obj->getTemperature(&temp) != kIOReturnSuccess) { return 0xFF; }
     return temp;
