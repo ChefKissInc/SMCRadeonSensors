@@ -70,10 +70,10 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
         VirtualSMCAPI::addKey(KeyTGxp(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
-        if (i == 0) {
-            VirtualSMCAPI::addKey(KeyTGDD, vsmcPlugin.data,
-                VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
-        }
+
+        if (i != 0) { continue; }
+        VirtualSMCAPI::addKey(KeyTGDD, vsmcPlugin.data,
+            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
     }
 
     qsort(const_cast<VirtualSMCKeyValue *>(vsmcPlugin.data.data()), vsmcPlugin.data.size(), sizeof(VirtualSMCKeyValue),
