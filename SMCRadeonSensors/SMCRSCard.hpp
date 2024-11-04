@@ -11,6 +11,7 @@ enum struct ChipFamily {
     SouthernIslands,
     VolcanicIslands,
     ArcticIslands,
+    ArcticIslandsTHM11,
     Raven,
     Navi,
 };
@@ -18,12 +19,10 @@ enum struct ChipFamily {
 class SMCRSCard : public OSObject {
     OSDeclareDefaultStructors(SMCRSCard);
 
-    ChipFamily chipFamily {ChipFamily::Unknown};
-
     IOPCIDevice *dev {nullptr};
     volatile UInt32 *rmmioPtr {nullptr};
     IOMemoryMap *rmmio {nullptr};
-    bool thm11 {false};
+    ChipFamily chipFamily {ChipFamily::Unknown};
 
     IOReturn ensureRMMIOMapped();
     UInt32 readReg32(UInt32 reg);
@@ -33,7 +32,8 @@ class SMCRSCard : public OSObject {
 
     IOReturn getTempSI(UInt16 *data);
     IOReturn getTempVI(UInt16 *data);
-    IOReturn getTempAI(UInt16 *data);
+    IOReturn getTempTHM9(UInt16 *data);
+    IOReturn getTempTHM11(UInt16 *data);
     IOReturn getTempRV(UInt16 *data);
 
     public:

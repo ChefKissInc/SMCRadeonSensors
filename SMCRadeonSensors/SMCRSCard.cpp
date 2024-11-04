@@ -77,9 +77,14 @@ IOReturn SMCRSCard::getTempVI(UInt16 *data) {
     return kIOReturnSuccess;
 }
 
-IOReturn SMCRSCard::getTempAI(UInt16 *data) {
-    auto reg =
-        this->readReg32(THM_BASE + (this->thm11 ? mmCG_MULT_THERMAL_STATUS_THM11 : mmCG_MULT_THERMAL_STATUS_THM9));
+IOReturn SMCRSCard::getTempTHM9(UInt16 *data) {
+    auto reg = this->readReg32(THM_BASE + mmCG_MULT_THERMAL_STATUS_THM9);
+    *data = GET_THERMAL_STATUS_CTF_TEMP(reg) & 0x1FF;
+    return kIOReturnSuccess;
+}
+
+IOReturn SMCRSCard::getTempTHM11(UInt16 *data) {
+    auto reg = this->readReg32(THM_BASE + mmCG_MULT_THERMAL_STATUS_THM11);
     *data = GET_THERMAL_STATUS_CTF_TEMP(reg) & 0x1FF;
     return kIOReturnSuccess;
 }
@@ -108,7 +113,9 @@ bool SMCRSCard::initialise(IOPCIDevice *device) {
             DBGLOG("RSCard", "Raven");
             break;
         case 0x66A0 ... 0x66AF:
-            this->thm11 = true;
+            this->chipFamily = ChipFamily::ArcticIslandsTHM11;
+            DBGLOG("RSCard", "Arctic Islands (THM 11)");
+            break;
         case 0x6860 ... 0x687F:
         case 0x69A0 ... 0x69AF:
             this->chipFamily = ChipFamily::ArcticIslands;
@@ -150,7 +157,9 @@ IOReturn SMCRSCard::getTemperature(UInt16 *data) {
         case ChipFamily::VolcanicIslands:
             return this->getTempVI(data);
         case ChipFamily::ArcticIslands:
-            return this->getTempAI(data);
+            return this->getTempTHM9(data);
+        case ChipFamily::ArcticIslandsTHM11:
+            return this->getTempTHM11(data);
         case ChipFamily::Raven:
         case ChipFamily::Navi:
             return this->getTempRV(data);
