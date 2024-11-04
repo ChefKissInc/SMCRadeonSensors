@@ -20,9 +20,9 @@ class EXPORT PRODUCT_NAME : public IOService {
     static constexpr SMC_KEY KeyTGDD = SMC_MAKE_IDENTIFIER('T', 'G', 'D', 'D');
 
     VirtualSMCAPI::Plugin vsmcPlugin {
-        xStringify(PRODUCT_NAME),
-        parseModuleVersion(xStringify(MODULE_VERSION)),
-        VirtualSMCAPI::Version,
+        .product = xStringify(PRODUCT_NAME),
+        .version = parseModuleVersion(xStringify(MODULE_VERSION)),
+        .apiver = VirtualSMCAPI::Version,
     };
 
     OSArray *cards {nullptr};
