@@ -142,7 +142,7 @@ UInt16 PRODUCT_NAME::getCardCount() { return this->cards ? this->cards->getCount
 
 EXPORT extern "C" kern_return_t ADDPR(kern_start)(kmod_info_t *, void *) {
     lilu_get_boot_args("liludelay", &ADDPR(debugPrintDelay), sizeof(ADDPR(debugPrintDelay)));
-    ADDPR(debugEnabled) = checkKernelArgument("-rsensordbg") || checkKernelArgument("-liludbgall");
+    ADDPR(debugEnabled) = checkKernelArgument("-RSDebug") || checkKernelArgument("-liludbgall");
     return KERN_SUCCESS;
 }
 
