@@ -4,8 +4,8 @@
 #pragma once
 #include <Headers/kern_iokit.hpp>
 #include <IOKit/IOService.h>
+#include <VirtualSMCSDK/AppleSmcBridge.hpp>
 #include <VirtualSMCSDK/kern_vsmcapi.hpp>
-#include <VirtualSMCSDK/AppleSmc.h>
 
 class EXPORT PRODUCT_NAME : public IOService {
     OSDeclareDefaultStructors(PRODUCT_NAME);
