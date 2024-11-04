@@ -1,10 +1,36 @@
 # Change log
 
+## 2.3.1 (27/10/2024)
+
+### Enhancements
+
+- Bumped submodules and improved optimisation settings
+
+**NOTE:** RadeonGadget has been removed. The project is now a single VirtualSMC plug-in. Don't forget to remove the old SMCRadeonGPU/RadeonSensor combination before putting this in. The philosophy behind this is to have as close to native experience as possible. Replacements for RadeonGadget include, but are not limited to, XS-Labs' Hot, exelban's Stats, iStat Menus (paid) and similar.
+
+## 2.3.0 (30/09/2024)
+
+### Enhancements
+
+- General project fixes and clean-up.
+
+**NOTE:** RadeonGadget has been removed. The project is now a single VirtualSMC plug-in. Don't forget to remove the old SMCRadeonGPU/RadeonSensor combination before putting this in. The philosophy behind this is to have as close to native experience as possible. Replacements for RadeonGadget include, but are not limited to, XS-Labs' Hot, exelban's Stats, iStat Menus (paid) and similar.
+
+## 2.2.0 (25/05/2024)
+
+### Bug fixes
+
+- On some systems cards would fail to register due to the register MMIO failing to be mapped early.
+
+**NOTE**: RadeonGadget has been removed. The project is now a single VirtualSMC plug-in. Don't forget to remove the old SMCRadeonGPU/RadeonSensor combination before putting this in. The philosophy behind this is to have as close to native experience as possible. Replacements for RadeonGadget include, but are not limited to, XS-Labs' Hot, exelban's Stats, iStat Menus (paid) and similar.
+
 ## 2.1.0 (25/05/2024)
 
-## Bug fixes
+### Bug fixes
 
 - Incorrect temperature readings were reported on Polaris and older cards.
+
+**NOTE:** RadeonGadget has been removed. The project is now a single VirtualSMC plug-in. Don't forget to remove the old SMCRadeonGPU/RadeonSensor combination before putting this in. The philosophy behind this is to have as close to native experience as possible. Replacements for RadeonGadget include, but are not limited to, XS-Labs' Hot, exelban's Stats, iStat Menus (paid) and similar.
 
 ## 2.0.0 (20/04/2024)
 
