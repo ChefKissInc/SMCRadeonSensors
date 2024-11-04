@@ -113,11 +113,11 @@ bool PRODUCT_NAME::vsmcNotificationHandler(void *target, void *, IOService *newS
         DBGLOG("SMCRS", "Submitted plugin");
         return true;
     }
-    if (ret != kIOReturnUnsupported) {
+    if (ret == kIOReturnUnsupported) {
+        SYSLOG("SMCRS", "Plugin submitted to non-VSMC");
+    } else {
         SYSLOG("SMCRS", "Plugin submission failure: 0x%X", ret);
-        return false;
     }
-    SYSLOG("SMCRS", "Plugin submitted to non-VSMC");
     return false;
 }
 
