@@ -42,15 +42,14 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
         auto vendorID = WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigVendorID);
         auto classCode = (WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigClassCode) >> 8) &
                          WIOKit::ClassCode::PCISubclassMask;
-        if (vendorID != WIOKit::VendorID::ATIAMD ||
-            (classCode != WIOKit::ClassCode::DisplayController && classCode != WIOKit::ClassCode::VGAController &&
-                classCode != WIOKit::ClassCode::Ex3DController && classCode != WIOKit::ClassCode::XGAController)) {
-            continue;
+        if (vendorID == WIOKit::VendorID::ATIAMD &&
+            (classCode == WIOKit::ClassCode::DisplayController || classCode == WIOKit::ClassCode::VGAController ||
+                classCode == WIOKit::ClassCode::Ex3DController || classCode == WIOKit::ClassCode::XGAController)) {
+            auto *card = new SMCRSCard {};
+            if (card == nullptr) { continue; }
+            if (card->initialise(device)) { this->cards->setObject(card); }
+            card->release();
         }
-        auto *card = new SMCRSCard {};
-        if (card == nullptr) { continue; }
-        if (card->initialise(device)) { this->cards->setObject(card); }
-        card->release();
     }
     iter->release();
 
