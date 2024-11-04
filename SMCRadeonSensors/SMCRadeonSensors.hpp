@@ -35,9 +35,9 @@ class EXPORT PRODUCT_NAME : public IOService {
     void free() APPLE_KEXT_OVERRIDE;
     void stop(IOService *provider) APPLE_KEXT_OVERRIDE;
 
+    virtual UInt32 getCardCount();
     virtual SMCRSCard *getCard(UInt32 index);
     virtual UInt16 getTemperature(UInt32 index);
-    virtual UInt16 getCardCount();
 
     static bool vsmcNotificationHandler(void *target, void *refCon, IOService *newService, IONotifier *notifier);
 };

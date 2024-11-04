@@ -128,8 +128,10 @@ void PRODUCT_NAME::free() {
     IOService::free();
 }
 
+UInt32 PRODUCT_NAME::getCardCount() { return this->cards ? this->cards->getCount() : 0; }
+
 SMCRSCard *PRODUCT_NAME::getCard(UInt32 index) {
-    if (this->cards == nullptr || index >= this->cards->getCount()) { return nullptr; }
+    if (index >= this->getCardCount()) { return nullptr; }
     return OSDynamicCast(SMCRSCard, this->cards->getObject(index));
 }
 
@@ -139,8 +141,6 @@ UInt16 PRODUCT_NAME::getTemperature(UInt32 index) {
     if (obj != nullptr) { obj->getTemperature(&temp); }
     return temp;
 }
-
-UInt16 PRODUCT_NAME::getCardCount() { return this->cards ? this->cards->getCount() : 0; }
 
 EXPORT extern "C" kern_return_t ADDPR(kern_start)(kmod_info_t *, void *) {
     lilu_get_boot_args("liludelay", &ADDPR(debugPrintDelay), sizeof(ADDPR(debugPrintDelay)));
