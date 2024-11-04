@@ -7,11 +7,11 @@
 
 class RadeonSMCValue : public VirtualSMCValue {
     protected:
-    size_t index {0};
+    UInt32 index {0};
     PRODUCT_NAME *provider {nullptr};
 
     public:
-    RadeonSMCValue(PRODUCT_NAME *provider, size_t index) : index {index}, provider {provider} {}
+    RadeonSMCValue(PRODUCT_NAME *provider, UInt32 index) : index {index}, provider {provider} {}
 };
 
 class RGPUTempValue : public RadeonSMCValue {
