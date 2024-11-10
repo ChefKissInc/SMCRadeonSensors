@@ -137,7 +137,7 @@ bool SMCRSCard::initialise(IOPCIDevice *device) {
             this->chipFamily = ChipFamily::SeaIslands;
             DBGLOG("RSCard", "Sea Islands");
             break;
-        case 0x7301 ... 0x73FF:
+        case 0x7310 ... 0x73FF:
             this->chipFamily = ChipFamily::Navi;
             DBGLOG("RSCard", "Navi");
             break;
