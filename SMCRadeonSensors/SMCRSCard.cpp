@@ -210,10 +210,10 @@ IOReturn SMCRSCard::smu7GetPowerPMStatus(float *data) {
     this->writeIndirectSMC(ixSMU_PM_STATUS_95, 0);
     UInt32 value = 0;
     for (size_t i = 0; i < 10; i += 1) {
-        IOSleep(500);
         this->smu7SendMessageToSMC(PPSMC_MSG_PmStatusLogSample_SMU7);
         value = this->readIndirectSMC(ixSMU_PM_STATUS_95);
         if (value != 0) { break; }
+        IOSleep(500);
     }
     if (value == 0) { return kIOReturnError; }
     *data = fractional8BitToFloat(value);
