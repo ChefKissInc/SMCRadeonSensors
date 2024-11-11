@@ -20,3 +20,10 @@ class RGPUTempValue : public RadeonSMCValue {
     protected:
     SMC_RESULT readAccess() APPLE_KEXT_OVERRIDE;
 };
+
+class RGPUPowerValue : public RadeonSMCValue {
+    using RadeonSMCValue::RadeonSMCValue;
+
+    protected:
+    SMC_RESULT readAccess() APPLE_KEXT_OVERRIDE;
+};

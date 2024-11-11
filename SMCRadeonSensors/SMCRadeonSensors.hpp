@@ -1,5 +1,5 @@
-//  Copyright © 2023-2024 ChefKiss. Licensed under the Thou Shalt Not Profit License version 1.5. See LICENSE for
-//  details.
+// Copyright © 2023-2024 ChefKiss. Licensed under the Thou Shalt Not Profit License version 1.5.
+// See LICENSE for details.
 
 #pragma once
 #include "SMCRSCard.hpp"
@@ -19,6 +19,8 @@ class EXPORT PRODUCT_NAME : public IOService {
     static constexpr SMC_KEY KeyTGxp(size_t i) { return SMC_MAKE_IDENTIFIER('T', 'G', KeyIndexes[i], 'p'); }
     static constexpr SMC_KEY KeyTGxd(size_t i) { return SMC_MAKE_IDENTIFIER('T', 'G', KeyIndexes[i], 'd'); }
     static constexpr SMC_KEY KeyTGDD = SMC_MAKE_IDENTIFIER('T', 'G', 'D', 'D');
+    static constexpr SMC_KEY KeyPGxR(size_t i) { return SMC_MAKE_IDENTIFIER('P', 'G', KeyIndexes[i], 'R'); }
+    static constexpr SMC_KEY KeyPGxC(size_t i) { return SMC_MAKE_IDENTIFIER('P', 'G', KeyIndexes[i], 'C'); }
 
     VirtualSMCAPI::Plugin vsmcPlugin {
         .product = xStringify(PRODUCT_NAME),
@@ -38,6 +40,7 @@ class EXPORT PRODUCT_NAME : public IOService {
     virtual UInt32 getCardCount();
     virtual SMCRSCard *getCard(UInt32 index);
     virtual UInt16 getTemperature(UInt32 index);
+    virtual float getPower(UInt32 index);
 
     static bool vsmcNotificationHandler(void *target, void *refCon, IOService *newService, IONotifier *notifier);
 };

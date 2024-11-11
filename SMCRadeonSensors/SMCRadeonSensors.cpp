@@ -1,5 +1,5 @@
-//  Copyright © 2023-2024 ChefKiss. Licensed under the Thou Shalt Not Profit License version 1.5. See LICENSE for
-//  details.
+// Copyright © 2023-2024 ChefKiss. Licensed under the Thou Shalt Not Profit License version 1.5.
+// See LICENSE for details.
 
 #include "SMCRadeonSensors.hpp"
 #include "KeyImplementations.hpp"
@@ -61,6 +61,9 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
     DBGLOG("SMCRS", "Found %u cards", this->cards->getCount());
 
     for (UInt32 i = 0; i < this->cards->getCount(); i++) {
+        auto *card = this->getCard(i);
+        if (card == nullptr) { continue; }
+
         VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
         VirtualSMCAPI::addKey(KeyTGxP(i), vsmcPlugin.data,
@@ -70,10 +73,23 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
         VirtualSMCAPI::addKey(KeyTGxp(i), vsmcPlugin.data,
             VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
 
-        if (i != 0) { continue; }
-        VirtualSMCAPI::addKey(KeyTGDD, vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+        if (card->supportsPower()) {
+            VirtualSMCAPI::addKey(KeyPGxR(i), vsmcPlugin.data,
+                VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp96, new RGPUPowerValue(this, i)));
+            VirtualSMCAPI::addKey(KeyPGxC(i), vsmcPlugin.data,
+                VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp96, new RGPUPowerValue(this, i)));
+        }
+
+        if (i == 0) {
+            VirtualSMCAPI::addKey(KeyTGDD, vsmcPlugin.data,
+                VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+        }
     }
+
+    // VG0C: Voltage
+    // IG0R: Current
+    // PG0C: Power
+    // PG0R: Power
 
     qsort(const_cast<VirtualSMCKeyValue *>(vsmcPlugin.data.data()), vsmcPlugin.data.size(), sizeof(VirtualSMCKeyValue),
         VirtualSMCKeyValue::compare);
@@ -140,6 +156,13 @@ UInt16 PRODUCT_NAME::getTemperature(UInt32 index) {
     auto *obj = this->getCard(index);
     if (obj != nullptr) { obj->getTemperature(&temp); }
     return temp;
+}
+
+float PRODUCT_NAME::getPower(UInt32 index) {
+    float power = 0.0;
+    auto *obj = this->getCard(index);
+    if (obj != nullptr) { obj->getPower(&power); }
+    return power;
 }
 
 EXPORT extern "C" kern_return_t ADDPR(kern_start)(kmod_info_t *, void *) {
