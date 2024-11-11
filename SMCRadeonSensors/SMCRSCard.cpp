@@ -91,11 +91,14 @@ UInt32 SMCRSCard::readIndirectSMC(UInt32 reg) {
         case SMCRSChipFamily::SouthernIslands:
             this->writeReg32(mmSMC_IND_INDEX_0, reg);
             ret = this->readReg32(mmSMC_IND_DATA_0);
+            break;
         case SMCRSChipFamily::VolcanicIslands:
             this->writeReg32(mmSMC_IND_INDEX_11, reg);
             ret = this->readReg32(mmSMC_IND_DATA_11);
+            break;
         default:
             ret = 0xFFFFFFFF;
+            break;
     }
     IOLockUnlock(this->indLock);
     return ret;
