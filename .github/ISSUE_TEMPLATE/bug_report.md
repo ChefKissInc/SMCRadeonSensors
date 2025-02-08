@@ -1,10 +1,9 @@
 ---
 name: Bug report
 about: Report an issue caused by RadeonSensor/RadeonGadget
-title: ''
-labels: Bug
-assignees: ''
-
+type: "Bug"
+assignees:
+  - VisualEhrmanntraut
 ---
 
 <!-- Only latest version of RadeonSensor/RadeonGadget is supported -->

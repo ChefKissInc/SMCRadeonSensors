@@ -1,10 +1,9 @@
 ---
 name: Feature request
 about: Request a new feature in RadeonSensor/RadeonGadget
-title: ''
-labels: Enhancement
-assignees: ''
-
+type: "Feature"
+assignees:
+  - VisualEhrmanntraut
 ---
 
 **Is your feature request related to a problem? Please describe.**
