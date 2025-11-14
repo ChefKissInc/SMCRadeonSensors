@@ -1,5 +1,23 @@
 # Change log
 
+## 2.4.0 (14/11/2025)
+
+### Enhancements
+
+- Cleaned up code and logic.
+- Changed debug arg to `-RSDebug`.
+- Add power readings for SI, CI, VI, AI.
+
+### Bug Fixes
+
+- Ensure PCI memory space is enabled.
+- Call IOService::stop when registerHandler fails.
+- Device ID 0x730F is Fiji, not 0x7301.
+- Sleep after checking PM_STATUS_95.
+- Misc fixes.
+
+**NOTE:** RadeonGadget has been removed. The project is now a single VirtualSMC plug-in. Don't forget to remove the old SMCRadeonGPU/RadeonSensor combination before putting this in. The philosophy behind this is to have as close to native experience as possible. Replacements for RadeonGadget include, but are not limited to, XS-Labs' Hot, exelban's Stats, iStat Menus (paid) and similar.
+
 ## 2.3.1 (27/10/2024)
 
 ### Enhancements
