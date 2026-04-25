@@ -9,22 +9,23 @@
 #include <Headers/kern_iokit.hpp>
 #include <Headers/kern_version.hpp>
 
-bool ADDPR(debugEnabled) = true;
+bool     ADDPR(debugEnabled)    = true;
 uint32_t ADDPR(debugPrintDelay) = 0;
 
 OSDefineMetaClassAndStructors(PRODUCT_NAME, IOService);
 
-IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
+IOService* PRODUCT_NAME::probe(IOService* provider, SInt32* score)
+{
     if (IOService::probe(provider, score) != this) { return nullptr; }
 
     this->setProperty("VersionInfo", kextVersion);
 
-    auto *dict = IOService::serviceMatching("IOPCIDevice");
+    auto* dict = IOService::serviceMatching("IOPCIDevice");
     if (dict == nullptr) {
         SYSLOG("SMCRS", "Failed to create matching dict for IOPCIDevice");
         return nullptr;
     }
-    auto *iter = IOService::getMatchingServices(dict);
+    auto* iter = IOService::getMatchingServices(dict);
     dict->release();
     if (iter == nullptr) {
         SYSLOG("SMCRS", "Failed to get iterator over IOPCIDevice");
@@ -36,16 +37,18 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
         iter->release();
         return nullptr;
     }
-    for (auto *device = OSDynamicCast(IOPCIDevice, iter->getNextObject()); device;
-         device = OSDynamicCast(IOPCIDevice, iter->getNextObject())) {
+    for (auto* device = OSDynamicCast(IOPCIDevice, iter->getNextObject()); device;
+         device       = OSDynamicCast(IOPCIDevice, iter->getNextObject()))
+    {
         WIOKit::awaitPublishing(device);
-        auto vendorID = WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigVendorID);
-        auto classCode = (WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigClassCode) >> 8) &
-                         WIOKit::ClassCode::PCISubclassMask;
-        if (vendorID == WIOKit::VendorID::ATIAMD &&
-            (classCode == WIOKit::ClassCode::DisplayController || classCode == WIOKit::ClassCode::VGAController ||
-                classCode == WIOKit::ClassCode::Ex3DController || classCode == WIOKit::ClassCode::XGAController)) {
-            auto *card = new SMCRSCard {};
+        auto vendorID  = WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigVendorID);
+        auto classCode = (WIOKit::readPCIConfigValue(device, WIOKit::kIOPCIConfigClassCode) >> 8)
+                         & WIOKit::ClassCode::PCISubclassMask;
+        if (vendorID == WIOKit::VendorID::ATIAMD
+            && (classCode == WIOKit::ClassCode::DisplayController || classCode == WIOKit::ClassCode::VGAController
+                || classCode == WIOKit::ClassCode::Ex3DController || classCode == WIOKit::ClassCode::XGAController))
+        {
+            auto* card = new SMCRSCard{};
             if (card == nullptr) { continue; }
             if (card->initialise(device)) { this->cards->setObject(card); }
             card->release();
@@ -61,28 +64,28 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
     DBGLOG("SMCRS", "Found %u cards", this->cards->getCount());
 
     for (UInt32 i = 0; i < this->cards->getCount(); i++) {
-        auto *card = this->getCard(i);
+        auto* card = this->getCard(i);
         if (card == nullptr) { continue; }
 
         VirtualSMCAPI::addKey(KeyTGxD(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+                              VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
         VirtualSMCAPI::addKey(KeyTGxP(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+                              VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
         VirtualSMCAPI::addKey(KeyTGxd(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+                              VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
         VirtualSMCAPI::addKey(KeyTGxp(i), vsmcPlugin.data,
-            VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+                              VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
 
         if (card->supportsPower()) {
             VirtualSMCAPI::addKey(KeyPGxR(i), vsmcPlugin.data,
-                VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp96, new RGPUPowerValue(this, i)));
+                                  VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp96, new RGPUPowerValue(this, i)));
             VirtualSMCAPI::addKey(KeyPGxC(i), vsmcPlugin.data,
-                VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp96, new RGPUPowerValue(this, i)));
+                                  VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp96, new RGPUPowerValue(this, i)));
         }
 
         if (i == 0) {
             VirtualSMCAPI::addKey(KeyTGDD, vsmcPlugin.data,
-                VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
+                                  VirtualSMCAPI::valueWithSp(0, SmcKeyTypeSp78, new RGPUTempValue(this, i)));
         }
     }
 
@@ -91,13 +94,14 @@ IOService *PRODUCT_NAME::probe(IOService *provider, SInt32 *score) {
     // PG0C: Power
     // PG0R: Power
 
-    qsort(const_cast<VirtualSMCKeyValue *>(vsmcPlugin.data.data()), vsmcPlugin.data.size(), sizeof(VirtualSMCKeyValue),
-        VirtualSMCKeyValue::compare);
+    qsort(const_cast<VirtualSMCKeyValue*>(vsmcPlugin.data.data()), vsmcPlugin.data.size(), sizeof(VirtualSMCKeyValue),
+          VirtualSMCKeyValue::compare);
 
     return this;
 }
 
-bool PRODUCT_NAME::start(IOService *provider) {
+bool PRODUCT_NAME::start(IOService* provider)
+{
     if (!IOService::start(provider)) {
         SYSLOG("SMCRS", "Failed to start the parent");
         return false;
@@ -117,58 +121,63 @@ bool PRODUCT_NAME::start(IOService *provider) {
     return true;
 }
 
-bool PRODUCT_NAME::vsmcNotificationHandler(void *target, void *, IOService *newService, IONotifier *) {
+bool PRODUCT_NAME::vsmcNotificationHandler(void* target, void*, IOService* newService, IONotifier*)
+{
     if (target == nullptr || newService == nullptr) {
         SYSLOG("SMCRS", "Null notification");
         return false;
     }
 
-    auto &plugin = static_cast<PRODUCT_NAME *>(target)->vsmcPlugin;
-    auto ret = newService->callPlatformFunction(VirtualSMCAPI::SubmitPlugin, true, target, &plugin, nullptr, nullptr);
+    auto& plugin = static_cast<PRODUCT_NAME*>(target)->vsmcPlugin;
+    auto  ret = newService->callPlatformFunction(VirtualSMCAPI::SubmitPlugin, true, target, &plugin, nullptr, nullptr);
     if (ret == kIOReturnSuccess) {
         DBGLOG("SMCRS", "Submitted plugin");
         return true;
     }
-    if (ret == kIOReturnUnsupported) {
-        SYSLOG("SMCRS", "Plugin submitted to non-VSMC");
-    } else {
+    if (ret == kIOReturnUnsupported) { SYSLOG("SMCRS", "Plugin submitted to non-VSMC"); }
+    else {
         SYSLOG("SMCRS", "Plugin submission failure: 0x%X", ret);
     }
     return false;
 }
 
-void PRODUCT_NAME::stop(IOService *) { PANIC("SMCRS", "Called stop!!!"); }
+void PRODUCT_NAME::stop(IOService*) { PANIC("SMCRS", "Called stop!!!"); }
 
-void PRODUCT_NAME::free() {
+void PRODUCT_NAME::free()
+{
     OSSafeReleaseNULL(this->cards);
     IOService::free();
 }
 
 UInt32 PRODUCT_NAME::getCardCount() { return this->cards ? this->cards->getCount() : 0; }
 
-SMCRSCard *PRODUCT_NAME::getCard(UInt32 index) {
+SMCRSCard* PRODUCT_NAME::getCard(UInt32 index)
+{
     if (index >= this->getCardCount()) { return nullptr; }
     return OSDynamicCast(SMCRSCard, this->cards->getObject(index));
 }
 
-UInt16 PRODUCT_NAME::getTemperature(UInt32 index) {
+UInt16 PRODUCT_NAME::getTemperature(UInt32 index)
+{
     UInt16 temp = 0xFF;
-    auto *obj = this->getCard(index);
+    auto*  obj  = this->getCard(index);
     if (obj != nullptr) { obj->getTemperature(&temp); }
     return temp;
 }
 
-float PRODUCT_NAME::getPower(UInt32 index) {
+float PRODUCT_NAME::getPower(UInt32 index)
+{
     float power = 0.0;
-    auto *obj = this->getCard(index);
+    auto* obj   = this->getCard(index);
     if (obj != nullptr) { obj->getPower(&power); }
     return power;
 }
 
-EXPORT extern "C" kern_return_t ADDPR(kern_start)(kmod_info_t *, void *) {
+EXPORT extern "C" kern_return_t ADDPR(kern_start)(kmod_info_t*, void*)
+{
     lilu_get_boot_args("liludelay", &ADDPR(debugPrintDelay), sizeof(ADDPR(debugPrintDelay)));
     ADDPR(debugEnabled) = checkKernelArgument("-RSDebug") || checkKernelArgument("-liludbgall");
     return KERN_SUCCESS;
 }
 
-EXPORT extern "C" kern_return_t ADDPR(kern_stop)(kmod_info_t *, void *) { return KERN_FAILURE; }
+EXPORT extern "C" kern_return_t ADDPR(kern_stop)(kmod_info_t*, void*) { return KERN_FAILURE; }

@@ -5,25 +5,31 @@
 #include "SMCRadeonSensors.hpp"
 #include <VirtualSMCSDK/AppleSmc.h>
 
-class RadeonSMCValue : public VirtualSMCValue {
-    protected:
-    UInt32 index {0};
-    PRODUCT_NAME *provider {nullptr};
+class RadeonSMCValue : public VirtualSMCValue
+{
+protected:
+    UInt32        index{0};
+    PRODUCT_NAME* provider{nullptr};
 
-    public:
-    RadeonSMCValue(PRODUCT_NAME *provider, UInt32 index) : index {index}, provider {provider} {}
+public:
+    RadeonSMCValue(PRODUCT_NAME* provider, UInt32 index) :
+        index{index},
+        provider{provider}
+    { }
 };
 
-class RGPUTempValue : public RadeonSMCValue {
+class RGPUTempValue : public RadeonSMCValue
+{
     using RadeonSMCValue::RadeonSMCValue;
 
-    protected:
+protected:
     SMC_RESULT readAccess() APPLE_KEXT_OVERRIDE;
 };
 
-class RGPUPowerValue : public RadeonSMCValue {
+class RGPUPowerValue : public RadeonSMCValue
+{
     using RadeonSMCValue::RadeonSMCValue;
 
-    protected:
+protected:
     SMC_RESULT readAccess() APPLE_KEXT_OVERRIDE;
 };

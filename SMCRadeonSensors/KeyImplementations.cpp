@@ -3,14 +3,16 @@
 
 #include "KeyImplementations.hpp"
 
-SMC_RESULT RGPUTempValue::readAccess() {
-    auto value = this->provider->getTemperature(this->index);
-    *reinterpret_cast<UInt16 *>(this->data) = VirtualSMCAPI::encodeIntSp(this->type, value);
+SMC_RESULT RGPUTempValue::readAccess()
+{
+    auto value                             = this->provider->getTemperature(this->index);
+    *reinterpret_cast<UInt16*>(this->data) = VirtualSMCAPI::encodeIntSp(this->type, value);
     return SmcSuccess;
 }
 
-SMC_RESULT RGPUPowerValue::readAccess() {
-    auto value = this->provider->getPower(this->index);
-    *reinterpret_cast<UInt16 *>(data) = VirtualSMCAPI::encodeSp(this->type, static_cast<double>(value));
+SMC_RESULT RGPUPowerValue::readAccess()
+{
+    auto value                       = this->provider->getPower(this->index);
+    *reinterpret_cast<UInt16*>(data) = VirtualSMCAPI::encodeSp(this->type, static_cast<double>(value));
     return SmcSuccess;
 }
